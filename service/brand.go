@@ -15,7 +15,7 @@ func (c *Service) SetLogger(l logger.StructLogger) {
 }
 
 // ListBrand ...
-func (c *Service) ListBrand(ctx context.Context, pager utils.Pager) ([]model.BrandInfo, error) {
+func (c *Service) ListBrand(ctx context.Context, pager *utils.Pager) ([]model.BrandInfo, error) {
 	tid := utils.GetTracingID(ctx)
 
 	c.log.Println("ListBrands", tid, "listing product brands from database")

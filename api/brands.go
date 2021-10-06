@@ -28,13 +28,13 @@ func NewBrandsController(svc *service.Service, lgr logger.StructLogger) *BrandsC
 // ListBrand ...
 func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	tid := utils.GetTracingID(r.Context())
-	pageQ, skipQ, limitQ, err := parseSkipLimit(r, 10, 100)
-	if err != nil {
-		cc.lgr.Errorln("listBrands", tid, err.Error())
-		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, err.Error(), nil)
+	pager, pageErr := utils.GetPager(r)
+	if pageErr != nil {
+		cc.lgr.Errorln("listBrands", tid, pageErr.Error())
+		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, pageErr.Error(), nil)
 		return
 	}
-	pager := utils.Pager{Skip: skipQ, Limit: limitQ}
+
 
 	cc.lgr.Println("listBrands", tid, "getting brands")
 	result, err := cc.svc.ListBrand(r.Context(), pager)
@@ -45,8 +45,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cc.lgr.Println("listBrands", tid, "sending response")
-	prev, next := getNextPreviousPager(r.URL.Path, pageQ, limitQ)
-	_ = response.ServeJSON(w, http.StatusOK, prev, next, utils.SuccessMessage, result)
+	_ = response.ServeJSON(w, http.StatusOK, pager.Prev, pager.Next, utils.SuccessMessage, result)
 	return
 }
 
