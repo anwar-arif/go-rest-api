@@ -40,7 +40,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	result, err := cc.svc.ListBrand(r.Context(), pager)
 	if err != nil {
 		cc.lgr.Errorln("listBrands", tid, err.Error())
-		_ = response.ServeJSON(w, http.StatusInternalServerError, nil, nil, err.Error(), nil)
+		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (cc *BrandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
 	err := cc.svc.AddBrand(r.Context(), b)
 	if err != nil {
 		cc.lgr.Errorln("AddBrand", tid, err.Error())
-		_ = response.ServeJSON(w, http.StatusInternalServerError, nil, nil, err.Error(), nil)
+		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
 		return
 	}
 

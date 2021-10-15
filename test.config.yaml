@@ -1,0 +1,17 @@
+app:
+  port:
+    8000
+  graceful_timeout:
+    30
+  system_server_port:
+    8001
+  api_secret_key:
+    your_api_secret_key
+  auth_base_url:
+    your_auth_base_url
+mongo:
+  url: mongodb://localhost:27017
+  db_name: boilerplate_test
+  time_out: 30
+collection:
+  brand: brands

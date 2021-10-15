@@ -14,6 +14,7 @@ type Response struct {
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
+
 type User struct {
 	Username    string   `json:"username"`
 	Usertype    string   `json:"user_type,omitempty"`
