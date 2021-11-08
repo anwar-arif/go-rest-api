@@ -9,7 +9,7 @@ var (
 type Error struct {
 	error
 	StatusCode int
-	Message string
+	Message    string
 }
 
 func (err *Error) Error() string {
@@ -19,6 +19,6 @@ func (err *Error) Error() string {
 func NewError(statusCode int, message string) *Error {
 	return &Error{
 		StatusCode: statusCode,
-		Message: message,
+		Message:    message,
 	}
 }

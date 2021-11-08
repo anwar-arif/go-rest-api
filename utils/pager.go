@@ -9,12 +9,12 @@ import (
 
 const (
 	DefaultLimit = 10
-	MaxLimit = 20
+	MaxLimit     = 20
 )
 
 type Pager struct {
 	Skip, Limit int64
-	Prev, Next *string
+	Prev, Next  *string
 }
 
 func GetPager(r *http.Request) (*Pager, error) {
@@ -24,10 +24,10 @@ func GetPager(r *http.Request) (*Pager, error) {
 	}
 	prev, next := getNextPreviousPager(r.URL.Path, page, limit)
 	return &Pager{
-		Skip: skip,
+		Skip:  skip,
 		Limit: limit,
-		Prev: prev,
-		Next: next,
+		Prev:  prev,
+		Next:  next,
 	}, nil
 }
 
@@ -70,4 +70,3 @@ func getNextPreviousPager(path string, page, limit int64) (*string, *string) {
 	next = fmt.Sprintf("%s?limit=%d&page=%d", path, limit, page+1)
 	return &previous, &next
 }
-

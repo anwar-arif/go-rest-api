@@ -35,7 +35,6 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	cc.lgr.Println("listBrands", tid, "getting brands")
 	result, err := cc.svc.ListBrand(r.Context(), pager)
 	if err != nil {
