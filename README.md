@@ -1,8 +1,7 @@
-# Go Boilerplate
+# Go rest api
 
-## Start Rest 
-
-## Build
+## Run on local
+### Build application binary
 ```bash
 $ ./build.sh
 or
@@ -10,14 +9,14 @@ $ make build
 ```
 
 
-## Application binary (run server)
+### Run application binary (run server)
 ```bash
 $ go-rest-api serve-rest
 or
 $ make run
 ```
 
-## Container dev
+## Run on Container
 ```bash
 $ docker-compose up --build
 or
@@ -30,7 +29,7 @@ $ cd e2e_test
 $ go test --config=../test.config.yaml -ginkgo.v
 ```
 
-## GuideLine
+## Folder structure
 
 * api folder contains rest controllers, middlewares
 * cmd folder contains application's base like main files
