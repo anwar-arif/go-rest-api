@@ -3,7 +3,6 @@ module go-rest-api
 go 1.15
 
 require (
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/getsentry/sentry-go v0.9.0
 	github.com/go-chi/chi v1.5.0
 	github.com/go-chi/cors v1.1.1
@@ -19,7 +18,4 @@ require (
 	go.mongodb.org/mongo-driver v1.4.3
 	go.uber.org/zap v1.10.0
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
-	golang.org/x/tools v0.1.4 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

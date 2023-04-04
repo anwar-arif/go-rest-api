@@ -105,7 +105,7 @@ const (
 	AuthorizationKey = "Authorization"
 )
 
-func GetUserInfoByTokenFromAuth(jwtTkn string) (*response.User, error) {
+func GetUserByJwtToken(jwtTkn string) (*response.User, error) {
 	sendError := errors.New("failed to validate token")
 
 	client := http.Client{Timeout: time.Minute * 2}
