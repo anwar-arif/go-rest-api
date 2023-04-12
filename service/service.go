@@ -1,6 +1,8 @@
 package service
 
 import (
+	"go-rest-api/config"
+	"go-rest-api/infra"
 	"go-rest-api/logger"
 	"go-rest-api/repo"
 )
@@ -9,12 +11,13 @@ import (
 type Service struct {
 	log       logger.StructLogger
 	brandRepo repo.BrandRepo
+	userRepo  repo.UserRepo
 }
 
-// New ...
-func New(brandRepo repo.BrandRepo, lgr logger.StructLogger) *Service {
+func New(cfgDBTable *config.Table, db infra.DB, lgr logger.StructLogger) *Service {
 	return &Service{
 		log:       lgr,
-		brandRepo: brandRepo,
+		brandRepo: repo.NewBrand(cfgDBTable.BrandCollectionName, db),
+		userRepo:  repo.NewUserRepo(cfgDBTable.UserCollectionName, db),
 	}
 }

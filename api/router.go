@@ -36,6 +36,7 @@ func NewApiRouter(svc *service.Service, logger logger.StructLogger) http.Handler
 
 	router.Route("/", func(r chi.Router) {
 		r.Mount("/brands", brandsRouter(NewBrandsController(svc, logger)))
+		r.Mount("/users", usersRouter(NewUsersController(svc, logger)))
 	})
 	return router
 }

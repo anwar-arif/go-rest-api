@@ -16,6 +16,7 @@ func AuthenticatedOnly(next http.Handler) http.Handler {
 				return
 			}
 			r.Header.Set(utils.AuthorizationKey, user.Username)
+			r.Header.Set(utils.RoleKey, user.Role)
 		}
 	})
 }

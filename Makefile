@@ -2,7 +2,7 @@ build:
 	./build.sh
 
 run: build
-	go run main.go serve-rest --config ./example.config.yaml
+	go-rest-api serve-rest --config example.config.yaml
 
 serve:
 	docker-compose down

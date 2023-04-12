@@ -18,7 +18,6 @@ import (
 	infraMongo "go-rest-api/infra/mongo"
 	infraSentry "go-rest-api/infra/sentry"
 	"go-rest-api/logger"
-	"go-rest-api/repo"
 	"go-rest-api/service"
 )
 
@@ -54,9 +53,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
-
-	svc := service.New(brandRepo, lgr)
+	svc := service.New(cfgDBTable, db, lgr)
 	api.SetLogger(logger.DefaultOutLogger)
 
 	errChan := make(chan error)

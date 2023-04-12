@@ -32,9 +32,11 @@ var migrationRoot = &cobra.Command{
 		defer db.Close(ctx)
 
 		brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
+		userRepo := repo.NewUserRepo(cfgDBTable.UserCollectionName, db)
 
 		repos = []repo.Repo{
 			brandRepo,
+			userRepo,
 		}
 
 		return nil

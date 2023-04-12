@@ -17,6 +17,15 @@ func brandsRouter(ctrl *BrandsController) http.Handler {
 	return h
 }
 
+func usersRouter(ctrl *UsersController) http.Handler {
+	h := chi.NewRouter()
+	h.Group(func(r chi.Router) {
+		r.Post("/create", ctrl.CreateUser)
+		r.Get("/", ctrl.GetByEmail)
+	})
+	return h
+}
+
 func pingRouter(ctrl *PingController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {

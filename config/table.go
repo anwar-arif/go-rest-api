@@ -10,6 +10,7 @@ import (
 // Table holds table configurations
 type Table struct {
 	BrandCollectionName string `yaml:"brand"`
+	UserCollectionName  string `yaml:"user"`
 }
 
 var tableOnce = sync.Once{}
@@ -22,6 +23,7 @@ func loadTable(fileName string) error {
 
 	tableConfig = &Table{
 		BrandCollectionName: viper.GetString("collection.brand"),
+		UserCollectionName:  viper.GetString("collection.user"),
 	}
 
 	log.Println("table config ", tableConfig)
