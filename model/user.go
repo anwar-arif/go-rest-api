@@ -15,11 +15,27 @@ type User struct {
 	Role      string   `json:"role,omitempty" bson:"role,omitempty"`
 }
 
-type GetByEmailRequest struct {
+type GetUserByEmailRequest struct {
 	Email string `json:"email"`
 }
 
-type UserResponse struct {
+type GetUserByEmailResponse struct {
 	UserName string `json:"user_name"`
 	Email    string `json:"email"`
+}
+
+type AuthUserData struct {
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
+	IsActive bool   `json:"is_active,omitempty" bson:"is_active,omitempty"`
+	IsAdmin  bool   `json:"is_admin,omitempty" bson:"is_admin,omitempty"`
+	UserID   string `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Token    string `json:"token,omitempty" bson:"token,omitempty"`
+	Role     string `json:"role,omitempty" bson:"role,omitempty"`
+}
+
+type AuthUserResponse struct {
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
+	Data    *AuthUserData `json:"data"`
 }

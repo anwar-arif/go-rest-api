@@ -22,7 +22,7 @@ func (s *Service) CreateUser(ctx context.Context, user *model.User) *response.Er
 	return nil
 }
 
-func (s *Service) GetByEmail(ctx context.Context, email *string) (*model.UserResponse, *response.Error) {
+func (s *Service) GetByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error) {
 	fn := "GetByEmail"
 	tid := utils.GetTracingID(ctx)
 	s.log.Println(fn, tid, "fetching user with email")
@@ -35,7 +35,7 @@ func (s *Service) GetByEmail(ctx context.Context, email *string) (*model.UserRes
 
 	s.log.Printf(fn, tid, "user found with email %v", *email)
 
-	return &model.UserResponse{
+	return &model.GetUserByEmailResponse{
 		UserName: user.UserName,
 		Email:    user.Email,
 	}, nil

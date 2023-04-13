@@ -53,7 +53,7 @@ func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, &model.UserResponse{
+	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, &model.GetUserByEmailResponse{
 		UserName: u.UserName,
 		Email:    u.Email,
 	})
@@ -64,7 +64,7 @@ func (uc *UsersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 	fn := "GetByEmail"
 	tid := utils.GetTracingID(r.Context())
 
-	var getByEmailReq *model.GetByEmailRequest
+	var getByEmailReq *model.GetUserByEmailRequest
 	if err := json.NewDecoder(r.Body).Decode(&getByEmailReq); err != nil {
 		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage("email"), nil)
 		return

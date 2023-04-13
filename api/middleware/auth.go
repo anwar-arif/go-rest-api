@@ -15,7 +15,7 @@ func AuthenticatedOnly(next http.Handler) http.Handler {
 				_ = response.Serve(w, http.StatusUnauthorized, "user could not be authenticated", nil)
 				return
 			}
-			r.Header.Set(utils.AuthorizationKey, user.Username)
+			r.Header.Set(utils.AuthorizationKey, user.UserName)
 			r.Header.Set(utils.RoleKey, user.Role)
 		}
 	})

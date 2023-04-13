@@ -2,7 +2,6 @@ package response
 
 import (
 	"encoding/json"
-	"go-rest-api/model"
 	"net/http"
 )
 
@@ -14,12 +13,6 @@ type Response struct {
 	//Count    int32       `json:"count" bson:"count"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
-}
-
-type AuthUserResponse struct {
-	Success bool               `json:"success"`
-	Message string             `json:"message,omitempty"`
-	Data    model.UserResponse `json:"data"`
 }
 
 // Serve serves json to http client
