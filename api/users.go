@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"go-rest-api/api/response"
+	"go-rest-api/infra"
 	"go-rest-api/logger"
 	"go-rest-api/model"
 	"go-rest-api/service"
@@ -23,41 +24,59 @@ func NewUsersController(svc *service.Service, lgr logger.StructLogger) *UsersCon
 }
 
 func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
+	fn := "CreateUser"
 	tid := utils.GetTracingID(r.Context())
 
 	var u *model.User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		uc.lgr.Errorln("CreateUser", tid, err.Error())
-		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, utils.RequiredFieldMessage(), nil)
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage(), nil)
+		return
+	}
+
+	// user exists with same email
+	existingUser, err := uc.svc.GetByEmail(r.Context(), &u.Email)
+	if err.Error() != infra.ErrNotFound.Error() {
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, http.StatusInternalServerError, "failed to create user", nil)
+		return
+	}
+	if existingUser != nil {
+		uc.lgr.Errorln(fn, tid, "this email is already in use")
+		_ = response.Serve(w, http.StatusConflict, "email already in use", nil)
 		return
 	}
 
 	if err := uc.svc.CreateUser(r.Context(), u); err != nil {
-		uc.lgr.Errorln("CreateUser", tid, err.Error())
-		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, err.StatusCode, err.Error(), nil)
 		return
 	}
 
-	_ = response.ServeJSON(w, http.StatusOK, nil, nil, utils.SuccessMessage, nil)
+	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, &model.UserResponse{
+		UserName: u.UserName,
+		Email:    u.Email,
+	})
 	return
 }
 
 func (uc *UsersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
+	fn := "GetByEmail"
 	tid := utils.GetTracingID(r.Context())
 
-	var email *string
-	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
-		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, utils.RequiredFieldMessage("email"), nil)
+	var getByEmailReq *model.GetByEmailRequest
+	if err := json.NewDecoder(r.Body).Decode(&getByEmailReq); err != nil {
+		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage("email"), nil)
 		return
 	}
 
-	user, err := uc.svc.GetByEmail(r.Context(), email)
+	user, err := uc.svc.GetByEmail(r.Context(), &getByEmailReq.Email)
 	if err != nil {
-		uc.lgr.Errorln("GetByEmail", tid, err.Error())
-		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, err.StatusCode, err.Error(), nil)
 		return
 	}
 
-	_ = response.ServeJSON(w, http.StatusOK, nil, nil, utils.SuccessMessage, user)
+	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, user)
 	return
 }

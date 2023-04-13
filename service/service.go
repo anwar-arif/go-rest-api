@@ -18,6 +18,6 @@ func New(cfgDBTable *config.Table, db infra.DB, lgr logger.StructLogger) *Servic
 	return &Service{
 		log:       lgr,
 		brandRepo: repo.NewBrand(cfgDBTable.BrandCollectionName, db),
-		userRepo:  repo.NewUserRepo(cfgDBTable.UserCollectionName, db),
+		userRepo:  repo.NewUser(cfgDBTable.UserCollectionName, db),
 	}
 }

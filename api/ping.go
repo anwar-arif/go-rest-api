@@ -25,6 +25,6 @@ func (pingCtrl *PingController) Ping(w http.ResponseWriter, r *http.Request) {
 		Method:      r.Method,
 		ServiceName: "Go rest api",
 	}
-	_ = response.ServeJSON(w, http.StatusOK, nil, nil, "success", ping)
+	_ = response.Serve(w, http.StatusOK, "success", ping)
 	return
 }

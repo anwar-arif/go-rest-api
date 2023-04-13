@@ -10,6 +10,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/viper"
 	"go-rest-api/api/response"
+	"go-rest-api/model"
 	"io/ioutil"
 	"log"
 	"math"
@@ -105,7 +106,7 @@ const (
 	AuthorizationKey = "Authorization"
 )
 
-func GetUserByJwtToken(jwtTkn string) (*response.User, error) {
+func GetUserByJwtToken(jwtTkn string) (*model.UserResponse, error) {
 	sendError := errors.New("failed to validate token")
 
 	client := http.Client{Timeout: time.Minute * 2}
@@ -152,7 +153,7 @@ func GetUserByJwtToken(jwtTkn string) (*response.User, error) {
 	err = json.Unmarshal(body, &reply)
 
 	res := reply.Data
-	if res.Username == "" {
+	if res.UserName == "" {
 		return nil, sendError
 	}
 

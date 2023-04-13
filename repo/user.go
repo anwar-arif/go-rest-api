@@ -17,7 +17,7 @@ type MgoUser struct {
 	db    infra.DB
 }
 
-func NewUserRepo(table string, db infra.DB) UserRepo {
+func NewUser(table string, db infra.DB) UserRepo {
 	return &MgoUser{
 		table: table,
 		db:    db,

@@ -32,7 +32,7 @@ var migrationRoot = &cobra.Command{
 		defer db.Close(ctx)
 
 		brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
-		userRepo := repo.NewUserRepo(cfgDBTable.UserCollectionName, db)
+		userRepo := repo.NewUser(cfgDBTable.UserCollectionName, db)
 
 		repos = []repo.Repo{
 			brandRepo,
@@ -74,7 +74,7 @@ var migrationDown = &cobra.Command{
 			}
 		}
 
-		log.Println("Database dopped successfully!")
+		log.Println("Database dropped successfully!")
 		return nil
 	},
 }

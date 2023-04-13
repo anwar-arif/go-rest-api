@@ -25,7 +25,7 @@ func NewSystemController(db infra.DB) *SystemController {
 
 func (s *SystemController) systemCheck(w http.ResponseWriter, r *http.Request) {
 	if err := s.connCheck(); err != nil {
-		_ = response.ServeJSON(w, http.StatusInternalServerError, nil, nil, err.Error(), nil)
+		_ = response.Serve(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 	response.ServeJSONData(w, "ok", http.StatusOK)
@@ -35,7 +35,7 @@ func (s *SystemController) systemCheck(w http.ResponseWriter, r *http.Request) {
 func (s *SystemController) apiCheck(w http.ResponseWriter, r *http.Request) {
 	log.Println("apiCheck")
 	if err := s.connCheck(); err != nil {
-		_ = response.ServeJSON(w, http.StatusInternalServerError, nil, nil, err.Error(), nil)
+		_ = response.Serve(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 	response.ServeJSONData(w, "ok", http.StatusOK)

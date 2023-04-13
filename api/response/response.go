@@ -2,41 +2,27 @@ package response
 
 import (
 	"encoding/json"
+	"go-rest-api/model"
 	"net/http"
 )
 
 type Response struct {
 	Status   int     `json:"-"`
-	Next     *string `json:"next,omitempty"`
-	Previous *string `json:"previous,omitempty"`
+	Next     *string `json:"next,omitempty"`     // for pagination, link for next page
+	Previous *string `json:"previous,omitempty"` // for pagination, link for previous page
 	//Results  interface{} `json:"results"`
 	//Count    int32       `json:"count" bson:"count"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
-type User struct {
-	Username    string   `json:"username"`
-	Usertype    string   `json:"user_type,omitempty"`
-	Groups      []string `json:"groups"`
-	Contact     string   `json:"contact,omitempty" bson:"contact,omitempty"`
-	FirstName   string   `json:"first_name,omitempty" bson:"first_name,omitempty"`
-	LastName    string   `json:"last_name,omitempty" bson:"last_name,omitempty"`
-	IsStaff     bool     `json:"is_staff,omitempty" bson:"is_staff,omitempty"`
-	IsActive    bool     `json:"is_active,omitempty" bson:"is_active,omitempty"`
-	IsSuperuser bool     `json:"is_superuser,omitempty"  bson:"is_superuser,omitempty"`
-	UserID      string   `json:"userid,omitempty"  bson:"userid,omitempty"`
-	Token       string   `json:"token,omitempty"  bson:"token,omitempty"`
-	Role        string   `json:"role,omitempty"  bson:"role,omitempty"`
-}
-
 type AuthUserResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message,omitempty"`
-	Data    User   `json:"data"`
+	Success bool               `json:"success"`
+	Message string             `json:"message,omitempty"`
+	Data    model.UserResponse `json:"data"`
 }
 
-// ServeJSON serves json to http client
+// Serve serves json to http client
 func (r *Response) ServeJSON(w http.ResponseWriter) error {
 	resp := &Response{
 		Next:     r.Next,
@@ -54,7 +40,7 @@ func (r *Response) ServeJSON(w http.ResponseWriter) error {
 	return nil
 }
 
-// ServeJSON a utility func which serves json to http client
+// Serve a utility func which serves json to http client
 func ServeJSON(w http.ResponseWriter, status int, previous, next *string, message string, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -73,6 +59,24 @@ func ServeJSON(w http.ResponseWriter, status int, previous, next *string, messag
 		return err
 	}
 
+	return nil
+}
+
+func Serve(w http.ResponseWriter, status int, message string, data interface{}) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	resp := &Response{
+		Status:   status,
+		Next:     nil,
+		Previous: nil,
+		Message:  message,
+		Data:     data,
+	}
+
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		return err
+	}
 	return nil
 }
 

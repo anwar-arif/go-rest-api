@@ -31,7 +31,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	pager, pageErr := utils.GetPager(r)
 	if pageErr != nil {
 		cc.lgr.Errorln("listBrands", tid, pageErr.Error())
-		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, pageErr.Error(), nil)
+		_ = response.Serve(w, http.StatusBadRequest, pageErr.Error(), nil)
 		return
 	}
 
@@ -39,7 +39,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	result, err := cc.svc.ListBrand(r.Context(), pager)
 	if err != nil {
 		cc.lgr.Errorln("listBrands", tid, err.Error())
-		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
+		_ = response.Serve(w, err.StatusCode, err.Error(), nil)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (cc *BrandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
 
 	var b *model.BrandInfo
 	if err := json.NewDecoder(r.Body).Decode(&b); err != nil {
-		_ = response.ServeJSON(w, http.StatusBadRequest, nil, nil, utils.RequiredFieldMessage(), nil)
+		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage(), nil)
 		return
 	}
 
@@ -62,11 +62,11 @@ func (cc *BrandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
 	err := cc.svc.AddBrand(r.Context(), b)
 	if err != nil {
 		cc.lgr.Errorln("AddBrand", tid, err.Error())
-		_ = response.ServeJSON(w, err.StatusCode, nil, nil, err.Error(), nil)
+		_ = response.Serve(w, err.StatusCode, err.Error(), nil)
 		return
 	}
 
 	cc.lgr.Println("AddBrand", tid, "sending response")
-	_ = response.ServeJSON(w, http.StatusOK, nil, nil, utils.SuccessMessage, nil)
+	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, nil)
 	return
 }

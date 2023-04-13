@@ -11,30 +11,32 @@ import (
 
 // ListBrand ...
 func (s *Service) ListBrand(ctx context.Context, pager *utils.Pager) ([]model.BrandInfo, *response.Error) {
+	fn := "ListBrands"
 	tid := utils.GetTracingID(ctx)
 
-	s.log.Println("ListBrands", tid, "listing product brands from database")
+	s.log.Println(fn, tid, "listing product brands from database")
 	brands, err := s.brandRepo.ListBrands(ctx, "", pager.Skip, pager.Limit)
 	if err != nil {
-		s.log.Errorln("ListBrands", tid, err.Error())
+		s.log.Errorln(fn, tid, err.Error())
 		return nil, response.NewError(http.StatusInternalServerError, err.Error())
 	}
 
-	s.log.Println("ListBrands", tid, "sent response successfully")
+	s.log.Println(fn, tid, "sent response successfully")
 	return brands, nil
 }
 
 // AddBrand ...
 func (s *Service) AddBrand(ctx context.Context, brand *model.BrandInfo) *response.Error {
+	fn := "AddBrand"
 	tid := utils.GetTracingID(ctx)
 
-	s.log.Println("AddBrand", tid, "inserting brands into database")
+	s.log.Println(fn, tid, "inserting brands into database")
 	err := s.brandRepo.Create(ctx, brand)
 	if err != nil {
-		s.log.Errorln("AddBrand", tid, err.Error())
+		s.log.Errorln(fn, tid, err.Error())
 		return response.NewError(http.StatusInternalServerError, err.Error())
 	}
 
-	s.log.Println("AddBrand", tid, "sent response successfully")
+	s.log.Println(fn, tid, "sent response successfully")
 	return nil
 }

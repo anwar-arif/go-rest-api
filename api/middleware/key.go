@@ -10,11 +10,11 @@ func AppKeyChecker(appKey string) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			key := r.Header.Get("Application-Key")
 			if len(key) == 0 {
-				response.ServeJSON(w, http.StatusUnauthorized, nil, nil, "'Application-Key' required", "")
+				response.Serve(w, http.StatusUnauthorized, "'Application-Key' required", "")
 				return
 			}
 			if key != appKey {
-				response.ServeJSON(w, http.StatusUnauthorized, nil, nil, "invalid 'Application-Key'", "")
+				response.Serve(w, http.StatusUnauthorized, "invalid 'Application-Key'", "")
 				return
 			}
 			next.ServeHTTP(w, r)
