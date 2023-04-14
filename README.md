@@ -24,6 +24,11 @@ $ make serve
 ```
 
 ## Testing
+### unit test
+```bash
+$ go test $(go list ./... | grep -v go-rest-api/e2e_test) -v
+```
+### end to end test
 ```bash
 $ cd e2e_test
 $ go test --config=../test.config.yaml -ginkgo.v
