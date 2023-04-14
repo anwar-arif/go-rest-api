@@ -1,13 +1,14 @@
 package api
 
 import (
+	"go-rest-api/api/controller"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 )
 
-func brandsRouter(ctrl BrandsController) http.Handler {
+func brandsRouter(ctrl controller.BrandsController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Get("/", ctrl.ListBrand)
@@ -17,7 +18,7 @@ func brandsRouter(ctrl BrandsController) http.Handler {
 	return h
 }
 
-func usersRouter(ctrl UsersController) http.Handler {
+func usersRouter(ctrl controller.UsersController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Post("/signup", ctrl.CreateUser)
@@ -27,7 +28,7 @@ func usersRouter(ctrl UsersController) http.Handler {
 	return h
 }
 
-func pingRouter(ctrl *PingController) http.Handler {
+func pingRouter(ctrl *controller.PingController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Get("/", ctrl.Ping)
@@ -35,12 +36,11 @@ func pingRouter(ctrl *PingController) http.Handler {
 	return h
 }
 
-func healthRouter(ctrl *SystemController) http.Handler {
+func healthRouter(ctrl *controller.SystemController) http.Handler {
 	log.Println("healthRouter")
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
-		//r.Get("/api", ctrl.apiCheck)
-		r.Get("/system", ctrl.systemCheck)
+		r.Get("/system", ctrl.SystemCheck)
 	})
 	return h
 }

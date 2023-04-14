@@ -1,4 +1,4 @@
-package api
+package controller
 
 import (
 	"go-rest-api/api/response"

@@ -1,4 +1,4 @@
-package api
+package controller
 
 import (
 	"context"
@@ -23,8 +23,8 @@ func NewSystemController(db infra.DB) *SystemController {
 	}
 }
 
-func (s *SystemController) systemCheck(w http.ResponseWriter, r *http.Request) {
-	if err := s.connCheck(); err != nil {
+func (s *SystemController) SystemCheck(w http.ResponseWriter, r *http.Request) {
+	if err := s.ConnCheck(); err != nil {
 		_ = response.Serve(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -32,9 +32,9 @@ func (s *SystemController) systemCheck(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (s *SystemController) apiCheck(w http.ResponseWriter, r *http.Request) {
-	log.Println("apiCheck")
-	if err := s.connCheck(); err != nil {
+func (s *SystemController) ApiCheck(w http.ResponseWriter, r *http.Request) {
+	log.Println("ApiCheck")
+	if err := s.ConnCheck(); err != nil {
 		_ = response.Serve(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -42,7 +42,7 @@ func (s *SystemController) apiCheck(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (s *SystemController) connCheck() error {
+func (s *SystemController) ConnCheck() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	log.Println("db ping")

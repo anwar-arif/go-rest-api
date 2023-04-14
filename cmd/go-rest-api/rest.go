@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"go-rest-api/api/controller"
 	"log"
 	"net/http"
 	"os"
@@ -72,7 +73,7 @@ func serve(cmd *cobra.Command, args []string) error {
 
 func startHealthServer(cfg *config.Application, db infra.DB) error {
 	log.Println("startHealthServer")
-	sc := api.NewSystemController(db)
+	sc := controller.NewSystemController(db)
 	api.NewSystemRouter(sc)
 	r := chi.NewMux()
 	r.Mount("/system/v1", api.NewSystemRouter(sc))

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"go-rest-api/api/controller"
 	"go-rest-api/config"
 	"go-rest-api/infra/mongo"
 	"io"
@@ -35,8 +36,8 @@ func NewApiRouter(cfgDBTable *config.Table, db *mongo.Mongo, logger logger.Struc
 	router.MethodNotAllowed(MethodNotAllowed)
 
 	router.Route("/", func(r chi.Router) {
-		r.Mount("/brands", brandsRouter(NewBrandsController(cfgDBTable, db, logger)))
-		r.Mount("/users", usersRouter(NewUsersController(cfgDBTable, db, logger)))
+		r.Mount("/brands", brandsRouter(controller.NewBrandsController(cfgDBTable, db, logger)))
+		r.Mount("/users", usersRouter(controller.NewUsersController(cfgDBTable, db, logger)))
 	})
 	return router
 }
@@ -54,14 +55,14 @@ func NewPingRouter(logger logger.StructLogger) http.Handler {
 	router.MethodNotAllowed(MethodNotAllowed)
 
 	router.Route("/", func(r chi.Router) {
-		r.Mount("/", pingRouter(NewPingController(logger)))
+		r.Mount("/", pingRouter(controller.NewPingController(logger)))
 	})
 
 	return router
 }
 
 // NewSystemRouter ...
-func NewSystemRouter(sysCtrl *SystemController) http.Handler {
+func NewSystemRouter(sysCtrl *controller.SystemController) http.Handler {
 	lgr.Println("NewSystemRouter")
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
