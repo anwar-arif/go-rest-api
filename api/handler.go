@@ -21,6 +21,7 @@ func usersRouter(ctrl *UsersController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Post("/signup", ctrl.CreateUser)
+		r.Post("/login", ctrl.LogIn)
 		r.Get("/", ctrl.GetByEmail)
 	})
 	return h

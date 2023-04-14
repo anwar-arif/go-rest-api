@@ -5,15 +5,15 @@ type User struct {
 	Email     string   `json:"email" bson:"email"`
 	Password  string   `json:"password" bson:"password"`
 	Salt      string   `json:"salt" bson:"salt"`
-	FirstName string   `json:"first_name,omitempty" bson:"first_name,omitempty"`
-	Groups    []string `json:"groups,omitempty" bson:"groups,omitempty"`
-	Contacts  []string `json:"contacts,omitempty" bson:"contacts,omitempty"`
-	LastName  string   `json:"last_name,omitempty" bson:"last_name,omitempty"`
-	IsActive  bool     `json:"is_active,omitempty" bson:"is_active,omitempty"`
-	IsAdmin   bool     `json:"is_admin,omitempty" bson:"is_admin,omitempty"`
-	UserID    string   `json:"user_id,omitempty" bson:"user_id,omitempty"`
-	Token     string   `json:"token,omitempty" bson:"token,omitempty"`
-	Role      string   `json:"role,omitempty" bson:"role,omitempty"`
+	FirstName string   `json:"first_name,omitempty" bson:"first_name"`
+	Groups    []string `json:"groups,omitempty" bson:"groups"`
+	Contacts  []string `json:"contacts,omitempty" bson:"contacts"`
+	LastName  string   `json:"last_name,omitempty" bson:"last_name"`
+	IsActive  bool     `json:"is_active,omitempty" bson:"is_active"`
+	IsAdmin   bool     `json:"is_admin,omitempty" bson:"is_admin"`
+	UserID    string   `json:"user_id,omitempty" bson:"user_id"`
+	Token     string   `json:"token,omitempty" bson:"token"`
+	Role      string   `json:"role,omitempty" bson:"role"`
 }
 
 type GetUserByEmailRequest struct {
@@ -25,18 +25,19 @@ type GetUserByEmailResponse struct {
 	Email    string `json:"email"`
 }
 
-type AuthUserData struct {
-	UserName string `json:"user_name"`
+type LoginRequest struct {
 	Email    string `json:"email"`
-	IsActive bool   `json:"is_active,omitempty" bson:"is_active,omitempty"`
-	IsAdmin  bool   `json:"is_admin,omitempty" bson:"is_admin,omitempty"`
-	UserID   string `json:"user_id,omitempty" bson:"user_id,omitempty"`
-	Token    string `json:"token,omitempty" bson:"token,omitempty"`
-	Role     string `json:"role,omitempty" bson:"role,omitempty"`
+	Password string `json:"password"`
 }
 
-type AuthUserResponse struct {
-	Status  string        `json:"status"`
-	Message string        `json:"message"`
-	Data    *AuthUserData `json:"data"`
+type AuthUserPrivateData struct {
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Salt     string `json:"salt"`
+	IsActive bool   `json:"is_active"`
+	IsAdmin  bool   `json:"is_admin"`
+	UserID   string `json:"user_id" `
+	Token    string `json:"token" `
+	Role     string `json:"role"`
 }

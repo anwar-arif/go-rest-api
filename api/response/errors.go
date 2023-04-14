@@ -2,6 +2,7 @@ package response
 
 import "errors"
 
+// ErrorSomethingWentWrong http api errors
 var (
 	ErrorSomethingWentWrong error = errors.New("something went wrong")
 )

@@ -44,7 +44,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cc.lgr.Println("listBrands", tid, "sending response")
-	_ = response.ServeJSON(w, http.StatusOK, pager.Prev, pager.Next, utils.SuccessMessage, result)
+	_ = response.ServeJSON(w, http.StatusOK, pager.Prev, pager.Next, response.Successful, result)
 	return
 }
 
@@ -67,6 +67,6 @@ func (cc *BrandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cc.lgr.Println("AddBrand", tid, "sending response")
-	_ = response.Serve(w, http.StatusOK, utils.SuccessMessage, nil)
+	_ = response.Serve(w, http.StatusOK, response.Successful, nil)
 	return
 }

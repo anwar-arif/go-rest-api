@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func IsValidChar(ch rune) bool {
+	for _, validChar := range myCharset {
+		if ch == validChar {
+			return true
+		}
+	}
+	return false
+}
+
 func TestGenerateSalt(t *testing.T) {
 	salt := GenerateSalt()
 	if salt == nil {
@@ -13,6 +22,12 @@ func TestGenerateSalt(t *testing.T) {
 	}
 	if len(*salt) != SaltSize {
 		t.Errorf("unexpected salt size")
+	}
+
+	for _, ch := range *salt {
+		if !IsValidChar(ch) {
+			t.Errorf("invalid character %v", ch)
+		}
 	}
 }
 

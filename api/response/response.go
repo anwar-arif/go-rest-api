@@ -96,3 +96,13 @@ func (res *responseData) serveJSON(w http.ResponseWriter) {
 		panic(err)
 	}
 }
+
+// http api response messages
+const (
+	CannotProcessRequest = "can't process the request"
+	Successful           = "successful"
+	UserNotFound         = "user not found"
+	InvalidCredential    = "invalid credential"
+	DeletedSuccessfully  = "deleted successfully"
+	CreatedSuccessfully  = "created successfully"
+)
