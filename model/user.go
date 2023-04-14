@@ -4,6 +4,7 @@ type User struct {
 	UserName  string   `json:"user_name" bson:"user_name"`
 	Email     string   `json:"email" bson:"email"`
 	Password  string   `json:"password" bson:"password"`
+	Salt      string   `json:"salt" bson:"salt"`
 	FirstName string   `json:"first_name,omitempty" bson:"first_name,omitempty"`
 	Groups    []string `json:"groups,omitempty" bson:"groups,omitempty"`
 	Contacts  []string `json:"contacts,omitempty" bson:"contacts,omitempty"`

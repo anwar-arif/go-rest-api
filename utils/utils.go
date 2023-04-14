@@ -2,6 +2,9 @@ package utils
 
 import (
 	"context"
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,10 +13,10 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/viper"
 	"go-rest-api/model"
+	"hash"
 	"io/ioutil"
 	"log"
 	"math"
-	"math/rand"
 	"net/http"
 	"strings"
 	"sync/atomic"
@@ -69,17 +72,17 @@ func SetTracingID(ctx context.Context) context.Context {
 const myCharset = "abcdefghijklmnopqrstuvwxyz" +
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-var seededRand *rand.Rand = rand.New(
-	rand.NewSource(time.Now().UnixNano()))
-
-func RandStr(length int) string {
-
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = myCharset[seededRand.Intn(len(myCharset))]
-	}
-	return string(b)
-}
+//var seededRand *rand.Rand = rand.New(
+//	rand.NewSource(time.Now().UnixNano()))
+//
+//func RandStr(length int) string {
+//
+//	b := make([]byte, length)
+//	for i := range b {
+//		b[i] = myCharset[seededRand.Intn(len(myCharset))]
+//	}
+//	return string(b)
+//}
 
 func DecodeInterface(input, output interface{}) error {
 	data, err := json.Marshal(input)
@@ -103,7 +106,44 @@ const (
 	RoleKey          = "role"
 	KeyForSecretKey  = "Secret-Key"
 	AuthorizationKey = "Authorization"
+	SaltSize         = 16
 )
+
+func GetHasher() hash.Hash {
+	return md5.New()
+}
+
+func GenerateSalt() *string {
+	var salt = make([]byte, 16)
+	_, err := rand.Read(salt)
+
+	if err != nil {
+		log.Println("error generating salt: ", err.Error())
+		return nil
+	}
+
+	saltStr := string(salt)
+
+	return &saltStr
+}
+
+func HashPassword(password string, salt string) string {
+	passwordBytes := []byte(password)
+	md5Hasher := GetHasher()
+
+	passwordBytes = append(passwordBytes, salt...)
+	md5Hasher.Write(passwordBytes)
+
+	hashedPassInBytes := md5Hasher.Sum(nil)
+	hashedPassInHex := hex.EncodeToString(hashedPassInBytes)
+
+	return hashedPassInHex
+}
+
+func IsSamePassword(hashedPassword, currentPassword string, salt string) bool {
+	currentPasswordHash := HashPassword(currentPassword, salt)
+	return hashedPassword == currentPasswordHash
+}
 
 func GetUserByJwtToken(jwtTkn string) (*model.AuthUserData, error) {
 	sendError := errors.New("failed to validate token")

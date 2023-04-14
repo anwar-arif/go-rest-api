@@ -29,7 +29,7 @@ func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	var u *model.User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		uc.lgr.Errorln(fn, tid, err.Error())
+		uc.lgr.Errorf(fn, tid, "error while parsing user payload: %v\n", err.Error())
 		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage(), nil)
 		return
 	}
@@ -37,15 +37,26 @@ func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// user exists with same email
 	existingUser, err := uc.svc.GetByEmail(r.Context(), &u.Email)
 	if err.Error() != infra.ErrNotFound.Error() {
-		uc.lgr.Errorln(fn, tid, err.Error())
+		uc.lgr.Errorf(fn, tid, "error while fetching user: %v\n", err.Error())
 		_ = response.Serve(w, http.StatusInternalServerError, "failed to create user", nil)
 		return
 	}
+
 	if existingUser != nil {
 		uc.lgr.Errorln(fn, tid, "this email is already in use")
 		_ = response.Serve(w, http.StatusConflict, "email already in use", nil)
 		return
 	}
+
+	salt := utils.GenerateSalt()
+	if salt == nil {
+		uc.lgr.Errorln(fn, tid, "failed to generate salt")
+		_ = response.Serve(w, http.StatusInternalServerError, "failed to create user", nil)
+		return
+	}
+
+	u.Salt = *salt
+	u.Password = utils.HashPassword(u.Password, u.Salt)
 
 	if err := uc.svc.CreateUser(r.Context(), u); err != nil {
 		uc.lgr.Errorln(fn, tid, err.Error())
