@@ -3,27 +3,39 @@ package api
 import (
 	"encoding/json"
 	"go-rest-api/api/response"
+	"go-rest-api/config"
 	"go-rest-api/infra"
+	"go-rest-api/infra/mongo"
 	"go-rest-api/logger"
 	"go-rest-api/model"
+	"go-rest-api/repo"
 	"go-rest-api/service"
 	"go-rest-api/utils"
 	"net/http"
 )
 
-type UsersController struct {
-	svc *service.Service
+type UsersController interface {
+	CreateUser(w http.ResponseWriter, r *http.Request)
+	LogIn(w http.ResponseWriter, r *http.Request)
+	GetByEmail(w http.ResponseWriter, r *http.Request)
+}
+
+type usersController struct {
+	svc service.UserService
 	lgr logger.StructLogger
 }
 
-func NewUsersController(svc *service.Service, lgr logger.StructLogger) *UsersController {
-	return &UsersController{
-		svc: svc,
+func NewUsersController(cfgDBTable *config.Table, db *mongo.Mongo, lgr logger.StructLogger) UsersController {
+	userRepo := repo.NewUser(cfgDBTable.UserCollectionName, db)
+	userService := service.NewUserService(lgr, userRepo)
+
+	return &usersController{
+		svc: userService,
 		lgr: lgr,
 	}
 }
 
-func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (uc *usersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	fn := "CreateUser"
 	tid := utils.GetTracingID(r.Context())
 
@@ -71,7 +83,7 @@ func (uc *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (uc *UsersController) LogIn(w http.ResponseWriter, r *http.Request) {
+func (uc *usersController) LogIn(w http.ResponseWriter, r *http.Request) {
 	fn := "LogIn"
 	tid := utils.GetTracingID(r.Context())
 
@@ -110,7 +122,7 @@ func (uc *UsersController) LogIn(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (uc *UsersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
+func (uc *usersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 	fn := "GetUserByEmail"
 	tid := utils.GetTracingID(r.Context())
 

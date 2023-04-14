@@ -4,18 +4,15 @@ import (
 	"go-rest-api/api/response"
 	"go-rest-api/logger"
 	"go-rest-api/model"
-	"go-rest-api/service"
 	"net/http"
 )
 
 type PingController struct {
-	svc *service.Service
 	lgr logger.StructLogger
 }
 
-func NewPingController(svc *service.Service, lgr logger.StructLogger) *PingController {
+func NewPingController(lgr logger.StructLogger) *PingController {
 	return &PingController{
-		svc: svc,
 		lgr: lgr,
 	}
 }

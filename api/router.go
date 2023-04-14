@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"go-rest-api/service"
+	"go-rest-api/config"
+	"go-rest-api/infra/mongo"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -23,7 +23,7 @@ func SetLogger(l logger.Logger) {
 }
 
 // NewApiRouter ..
-func NewApiRouter(svc *service.Service, logger logger.StructLogger) http.Handler {
+func NewApiRouter(cfgDBTable *config.Table, db *mongo.Mongo, logger logger.StructLogger) http.Handler {
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger(lgr))
@@ -35,13 +35,13 @@ func NewApiRouter(svc *service.Service, logger logger.StructLogger) http.Handler
 	router.MethodNotAllowed(MethodNotAllowed)
 
 	router.Route("/", func(r chi.Router) {
-		r.Mount("/brands", brandsRouter(NewBrandsController(svc, logger)))
-		r.Mount("/users", usersRouter(NewUsersController(svc, logger)))
+		r.Mount("/brands", brandsRouter(NewBrandsController(cfgDBTable, db, logger)))
+		r.Mount("/users", usersRouter(NewUsersController(cfgDBTable, db, logger)))
 	})
 	return router
 }
 
-func NewPingRouter(svc *service.Service, logger logger.StructLogger) http.Handler {
+func NewPingRouter(logger logger.StructLogger) http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
@@ -54,7 +54,7 @@ func NewPingRouter(svc *service.Service, logger logger.StructLogger) http.Handle
 	router.MethodNotAllowed(MethodNotAllowed)
 
 	router.Route("/", func(r chi.Router) {
-		r.Mount("/", pingRouter(NewPingController(svc, logger)))
+		r.Mount("/", pingRouter(NewPingController(logger)))
 	})
 
 	return router
@@ -62,7 +62,7 @@ func NewPingRouter(svc *service.Service, logger logger.StructLogger) http.Handle
 
 // NewSystemRouter ...
 func NewSystemRouter(sysCtrl *SystemController) http.Handler {
-	log.Println("NewSystemRouter")
+	lgr.Println("NewSystemRouter")
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger(lgr))

@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func brandsRouter(ctrl *BrandsController) http.Handler {
+func brandsRouter(ctrl BrandsController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Get("/", ctrl.ListBrand)
@@ -17,7 +17,7 @@ func brandsRouter(ctrl *BrandsController) http.Handler {
 	return h
 }
 
-func usersRouter(ctrl *UsersController) http.Handler {
+func usersRouter(ctrl UsersController) http.Handler {
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
 		r.Post("/signup", ctrl.CreateUser)
@@ -39,7 +39,8 @@ func healthRouter(ctrl *SystemController) http.Handler {
 	log.Println("healthRouter")
 	h := chi.NewRouter()
 	h.Group(func(r chi.Router) {
-		r.Get("/api", ctrl.apiCheck)
+		//r.Get("/api", ctrl.apiCheck)
+		r.Get("/system", ctrl.systemCheck)
 	})
 	return h
 }

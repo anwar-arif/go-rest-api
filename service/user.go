@@ -4,12 +4,32 @@ import (
 	"context"
 	"go-rest-api/api/response"
 	"go-rest-api/infra"
+	"go-rest-api/logger"
 	"go-rest-api/model"
+	"go-rest-api/repo"
 	"go-rest-api/utils"
 	"net/http"
 )
 
-func (s *Service) CreateUser(ctx context.Context, user *model.User) *response.Error {
+type UserService interface {
+	CreateUser(ctx context.Context, user *model.User) *response.Error
+	GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error)
+	GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error)
+}
+
+type userService struct {
+	log      logger.StructLogger
+	userRepo repo.UserRepo
+}
+
+func NewUserService(lgr logger.StructLogger, userRepo repo.UserRepo) UserService {
+	return &userService{
+		log:      lgr,
+		userRepo: userRepo,
+	}
+}
+
+func (s *userService) CreateUser(ctx context.Context, user *model.User) *response.Error {
 	fn := "CreateUser"
 	tid := utils.GetTracingID(ctx)
 	s.log.Println(fn, tid, "creating user")
@@ -23,7 +43,7 @@ func (s *Service) CreateUser(ctx context.Context, user *model.User) *response.Er
 	return nil
 }
 
-func (s *Service) GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error) {
+func (s *userService) GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error) {
 	fn := "GetUserByEmail"
 	tid := utils.GetTracingID(ctx)
 	s.log.Println(fn, tid, "fetching user with email")
@@ -42,7 +62,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, email *string) (*model.Get
 	}, nil
 }
 
-func (s *Service) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error) {
+func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error) {
 	fn := "GetAuthUserByEmail"
 	tid := utils.GetTracingID(ctx)
 

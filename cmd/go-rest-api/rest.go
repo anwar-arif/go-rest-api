@@ -18,7 +18,6 @@ import (
 	infraMongo "go-rest-api/infra/mongo"
 	infraSentry "go-rest-api/infra/sentry"
 	"go-rest-api/logger"
-	"go-rest-api/service"
 )
 
 // srvCmd is the serve sub command to start the api server
@@ -53,7 +52,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	svc := service.New(cfgDBTable, db, lgr)
 	api.SetLogger(logger.DefaultOutLogger)
 
 	errChan := make(chan error)
@@ -64,7 +62,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	}()
 
 	go func() {
-		if err := startApiServer(cfgApp, svc, lgr); err != nil {
+		if err := startApiServer(cfgApp, cfgDBTable, db, lgr); err != nil {
 			errChan <- err
 		}
 	}()
@@ -113,14 +111,14 @@ func startHealthServer(cfg *config.Application, db infra.DB) error {
 	return <-errCh
 }
 
-func startApiServer(cfg *config.Application, svc *service.Service, lgr logger.StructLogger) error {
+func startApiServer(cfgApp *config.Application, cfgDBTable *config.Table, db *infraMongo.Mongo, lgr logger.StructLogger) error {
 
 	r := chi.NewMux()
-	r.Mount("/api/v1", api.NewApiRouter(svc, lgr))
-	r.Mount("/", api.NewPingRouter(svc, lgr))
+	r.Mount("/api/v1", api.NewApiRouter(cfgDBTable, db, lgr))
+	r.Mount("/", api.NewPingRouter(lgr))
 
 	srvr := http.Server{
-		Addr:    getAddressFromHostAndPort(cfg.Host, cfg.Port),
+		Addr:    getAddressFromHostAndPort(cfgApp.Host, cfgApp.Port),
 		Handler: r,
 		//ErrorLog: logger.DefaultErrLogger,
 		//WriteTimeout: cfg.WriteTimeout,

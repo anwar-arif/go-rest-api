@@ -3,14 +3,33 @@ package service
 import (
 	"context"
 	"go-rest-api/api/response"
+	"go-rest-api/logger"
+	"go-rest-api/repo"
 	"net/http"
 
 	"go-rest-api/model"
 	"go-rest-api/utils"
 )
 
+type BrandService interface {
+	ListBrand(ctx context.Context, pager *utils.Pager) ([]model.BrandInfo, *response.Error)
+	AddBrand(ctx context.Context, brand *model.BrandInfo) *response.Error
+}
+
+type brandService struct {
+	log       logger.StructLogger
+	brandRepo repo.BrandRepo
+}
+
+func NewBrandService(lgr logger.StructLogger, brandRepo repo.BrandRepo) BrandService {
+	return &brandService{
+		log:       lgr,
+		brandRepo: brandRepo,
+	}
+}
+
 // ListBrand ...
-func (s *Service) ListBrand(ctx context.Context, pager *utils.Pager) ([]model.BrandInfo, *response.Error) {
+func (s *brandService) ListBrand(ctx context.Context, pager *utils.Pager) ([]model.BrandInfo, *response.Error) {
 	fn := "ListBrands"
 	tid := utils.GetTracingID(ctx)
 
@@ -26,7 +45,7 @@ func (s *Service) ListBrand(ctx context.Context, pager *utils.Pager) ([]model.Br
 }
 
 // AddBrand ...
-func (s *Service) AddBrand(ctx context.Context, brand *model.BrandInfo) *response.Error {
+func (s *brandService) AddBrand(ctx context.Context, brand *model.BrandInfo) *response.Error {
 	fn := "AddBrand"
 	tid := utils.GetTracingID(ctx)
 

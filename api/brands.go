@@ -2,6 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"go-rest-api/config"
+	"go-rest-api/infra/mongo"
+	"go-rest-api/repo"
 	"net/http"
 
 	"go-rest-api/api/response"
@@ -11,22 +14,30 @@ import (
 	"go-rest-api/utils"
 )
 
+type BrandsController interface {
+	ListBrand(w http.ResponseWriter, r *http.Request)
+	AddBrand(w http.ResponseWriter, r *http.Request)
+}
+
 // BrandsController ...
-type BrandsController struct {
-	svc *service.Service
+type brandsController struct {
+	svc service.BrandService
 	lgr logger.StructLogger
 }
 
 // NewBrandsController ...
-func NewBrandsController(svc *service.Service, lgr logger.StructLogger) *BrandsController {
-	return &BrandsController{
+func NewBrandsController(cfgDBTable *config.Table, db *mongo.Mongo, lgr logger.StructLogger) BrandsController {
+	brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
+	svc := service.NewBrandService(lgr, brandRepo)
+
+	return &brandsController{
 		svc: svc,
 		lgr: lgr,
 	}
 }
 
 // ListBrand ...
-func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
+func (cc *brandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 	tid := utils.GetTracingID(r.Context())
 	pager, pageErr := utils.GetPager(r)
 	if pageErr != nil {
@@ -49,7 +60,7 @@ func (cc *BrandsController) ListBrand(w http.ResponseWriter, r *http.Request) {
 }
 
 // AddBrand ...
-func (cc *BrandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
+func (cc *brandsController) AddBrand(w http.ResponseWriter, r *http.Request) {
 	tid := utils.GetTracingID(r.Context())
 
 	var b *model.BrandInfo
