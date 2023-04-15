@@ -48,7 +48,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email *string) (*model
 	tid := utils.GetTracingID(ctx)
 	s.log.Println(fn, tid, "fetching user with email")
 
-	user, err := s.userRepo.GetUserByEmail(ctx, email)
+	user, err := s.userRepo.GetUserByEmail(ctx, *email)
 	if err != nil {
 		s.log.Errorln(fn, tid, err.Error())
 		return nil, response.NewError(http.StatusNotFound, err.Error())
@@ -68,7 +68,7 @@ func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*m
 
 	s.log.Println(fn, tid, "fetching auth user by email")
 
-	user, err := s.userRepo.GetAuthUserByEmail(ctx, email)
+	user, err := s.userRepo.GetAuthUserByEmail(ctx, *email)
 	if err != nil {
 		s.log.Errorln(fn, tid, err.Error())
 		return nil, infra.ErrNotFound

@@ -9,8 +9,8 @@ import (
 type UserRepo interface {
 	Repo
 	Create(ctx context.Context, user *model.User) error
-	GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, error)
-	GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error)
+	GetUserByEmail(ctx context.Context, email string) (*model.GetUserByEmailResponse, error)
+	GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserPrivateData, error)
 }
 
 type MgoUser struct {
@@ -48,26 +48,31 @@ func (u *MgoUser) Create(ctx context.Context, user *model.User) error {
 	return u.db.Insert(ctx, u.table, user)
 }
 
-func (u *MgoUser) GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, error) {
+func (u *MgoUser) GetUserByEmail(ctx context.Context, email string) (*model.GetUserByEmailResponse, error) {
 	q := infra.DbQuery{
 		{"email", email},
 	}
-	user := &model.GetUserByEmailResponse{}
 
-	if err := u.db.FindOne(ctx, u.table, q, &user); err != nil {
+	user := &model.User{}
+	if err := u.db.FindOne(ctx, u.table, q, user); err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	userByEmailResponse := &model.GetUserByEmailResponse{
+		Email:    user.Email,
+		UserName: user.UserName,
+	}
+
+	return userByEmailResponse, nil
 }
 
-func (u *MgoUser) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error) {
+func (u *MgoUser) GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserPrivateData, error) {
 	q := infra.DbQuery{
 		{"email", email},
 	}
 	user := &model.AuthUserPrivateData{}
 
-	if err := u.db.FindOne(ctx, u.table, q, &user); err != nil {
+	if err := u.db.FindOne(ctx, u.table, q, user); err != nil {
 		return nil, err
 	}
 
