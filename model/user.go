@@ -30,7 +30,12 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-type AuthUserPrivateData struct {
+type LoginResponse struct {
+	Email       string `json:"email"`
+	AccessToken string `json:"access_token"`
+}
+
+type AuthUserData struct {
 	UserName string `json:"user_name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -40,4 +45,12 @@ type AuthUserPrivateData struct {
 	UserID   string `json:"user_id" `
 	Token    string `json:"token" `
 	Role     string `json:"role"`
+}
+
+func (au *AuthUserData) ToUser() *User {
+	return &User{
+		UserName: au.UserName,
+		Email:    au.Email,
+		Role:     au.Role,
+	}
 }

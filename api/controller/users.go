@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/spf13/viper"
 	"go-rest-api/api/response"
 	"go-rest-api/config"
 	"go-rest-api/infra"
@@ -93,32 +94,36 @@ func (uc *usersController) LogIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := uc.svc.GetAuthUserByEmail(r.Context(), &loginReq.Email)
+	au, err := uc.svc.GetAuthUserByEmail(r.Context(), &loginReq.Email)
 	if (err != nil) && (err.Error() != infra.ErrNotFound.Error()) {
 		uc.lgr.Errorln(fn, tid, http.StatusText(http.StatusInternalServerError))
 		_ = response.Serve(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
 		return
 	}
 
-	if user == nil {
+	if au == nil {
 		uc.lgr.Errorln(fn, tid, response.UserNotFound)
 		_ = response.Serve(w, http.StatusNotFound, response.InvalidCredential, nil)
 		return
 	}
 
-	uc.lgr.Printf(fn, tid, "user.Password: %v, user.Salt: %v", user.Password, user.Salt)
-	uc.lgr.Printf(fn, tid, "requested password: %v", loginReq.Password)
-
-	if utils.IsSamePassword(user.Password, loginReq.Password, user.Salt) == false {
+	if utils.IsSamePassword(au.Password, loginReq.Password, au.Salt) == false {
 		uc.lgr.Errorln(fn, tid, response.InvalidCredential)
 		_ = response.Serve(w, http.StatusBadRequest, response.InvalidCredential, nil)
 		return
 	}
 
 	// generate access token
+	viper.AutomaticEnv()
+	secretKey := viper.GetString("app.api_secret_key")
+	uc.lgr.Printf(fn, tid, "secretKey: %v", secretKey)
+	token, err := utils.GenerateToken(au.ToUser(), secretKey)
 
 	// return success response
-	_ = response.Serve(w, http.StatusOK, response.Successful, nil)
+	_ = response.Serve(w, http.StatusOK, response.Successful, model.LoginResponse{
+		Email:       au.Email,
+		AccessToken: token,
+	})
 	return
 }
 

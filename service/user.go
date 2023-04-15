@@ -14,7 +14,7 @@ import (
 type UserService interface {
 	CreateUser(ctx context.Context, user *model.User) *response.Error
 	GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error)
-	GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error)
+	GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserData, error)
 }
 
 type userService struct {
@@ -62,7 +62,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email *string) (*model
 	}, nil
 }
 
-func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserPrivateData, error) {
+func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserData, error) {
 	fn := "GetAuthUserByEmail"
 	tid := utils.GetTracingID(ctx)
 

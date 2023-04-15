@@ -10,7 +10,7 @@ type UserRepo interface {
 	Repo
 	Create(ctx context.Context, user *model.User) error
 	GetUserByEmail(ctx context.Context, email string) (*model.GetUserByEmailResponse, error)
-	GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserPrivateData, error)
+	GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserData, error)
 }
 
 type MgoUser struct {
@@ -66,11 +66,11 @@ func (u *MgoUser) GetUserByEmail(ctx context.Context, email string) (*model.GetU
 	return userByEmailResponse, nil
 }
 
-func (u *MgoUser) GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserPrivateData, error) {
+func (u *MgoUser) GetAuthUserByEmail(ctx context.Context, email string) (*model.AuthUserData, error) {
 	q := infra.DbQuery{
 		{"email", email},
 	}
-	user := &model.AuthUserPrivateData{}
+	user := &model.AuthUserData{}
 
 	if err := u.db.FindOne(ctx, u.table, q, user); err != nil {
 		return nil, err

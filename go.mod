@@ -6,6 +6,7 @@ require (
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.1
+	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2
 	github.com/google/uuid v1.3.0
 	github.com/json-iterator/go v1.1.12
 	github.com/onsi/ginkgo v1.16.5
