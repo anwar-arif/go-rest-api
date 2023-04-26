@@ -116,7 +116,6 @@ func (uc *usersController) LogIn(w http.ResponseWriter, r *http.Request) {
 	// generate access token
 	viper.AutomaticEnv()
 	secretKey := viper.GetString("app.api_secret_key")
-	uc.lgr.Printf(fn, tid, "secretKey: %v", secretKey)
 	token, err := utils.GenerateToken(au.ToUser(), secretKey)
 
 	// return success response
@@ -135,6 +134,14 @@ func (uc *usersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&getByEmailReq); err != nil {
 		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage("email"), nil)
 		return
+	}
+
+	if claims, ok := utils.JWTClaimsFromContext(r.Context()); ok {
+		email := claims["email"].(string)
+		if email != getByEmailReq.Email {
+			_ = response.Serve(w, http.StatusUnauthorized, "unauthorized access", nil)
+			return
+		}
 	}
 
 	user, err := uc.svc.GetUserByEmail(r.Context(), &getByEmailReq.Email)

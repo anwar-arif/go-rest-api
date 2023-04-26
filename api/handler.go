@@ -2,6 +2,7 @@ package api
 
 import (
 	"go-rest-api/api/controller"
+	"go-rest-api/api/middleware"
 	"log"
 	"net/http"
 
@@ -23,6 +24,9 @@ func usersRouter(ctrl controller.UsersController) http.Handler {
 	h.Group(func(r chi.Router) {
 		r.Post("/signup", ctrl.CreateUser)
 		r.Post("/login", ctrl.LogIn)
+	})
+	h.Group(func(r chi.Router) {
+		r.Use(middleware.AuthenticatedOnly)
 		r.Get("/", ctrl.GetByEmail)
 	})
 	return h

@@ -99,6 +99,7 @@ func (res *responseData) serveJSON(w http.ResponseWriter) {
 
 // http api response messages
 const (
+	CannotProcessToken   = "can't process the token"
 	CannotProcessRequest = "can't process the request"
 	Successful           = "successful"
 	UserNotFound         = "user not found"

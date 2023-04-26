@@ -23,12 +23,19 @@ func TestGenerateToken(t *testing.T) {
 	fmt.Println("token: ", token)
 }
 
-func TestValidateToken(t *testing.T) {
+func TestGetClaimsFromToken(t *testing.T) {
 	token, err := GenerateToken(&user, apiSecretKey)
 	if err != nil {
 		t.Errorf("err while generating token: %v", err.Error())
 	}
-	if !ValidateToken(token, apiSecretKey) {
+	claims, err := GetClaimsFromToken(token, apiSecretKey)
+	if err != nil {
 		t.Errorf("invalid token")
+	}
+	emailInToken := claims["email"].(string)
+	roleInToken := claims["role"].(string)
+
+	if (emailInToken != user.Email) || (roleInToken != user.Role) {
+		t.Errorf("email or role in the token is tempered")
 	}
 }
