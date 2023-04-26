@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"go-rest-api/model"
 	"testing"
 )
@@ -20,7 +19,13 @@ func TestGenerateToken(t *testing.T) {
 	if err != nil {
 		t.Errorf("err while generating token: %v", err.Error())
 	}
-	fmt.Println("token: ", token)
+	claims, err := GetClaimsFromToken(token, apiSecretKey)
+	if err != nil {
+		t.Errorf("can't parse token")
+	}
+	if (claims.Email != user.Email) || (claims.Role != user.Role) {
+		t.Errorf("invalid token")
+	}
 }
 
 func TestGetClaimsFromToken(t *testing.T) {
@@ -32,10 +37,11 @@ func TestGetClaimsFromToken(t *testing.T) {
 	if err != nil {
 		t.Errorf("invalid token")
 	}
-	emailInToken := claims["email"].(string)
-	roleInToken := claims["role"].(string)
+	emailInToken := claims.Email
+	roleInToken := claims.Role
+	issuerInToken := claims.Issuer
 
-	if (emailInToken != user.Email) || (roleInToken != user.Role) {
+	if (emailInToken != user.Email) || (roleInToken != user.Role) || (issuerInToken != Issuer) {
 		t.Errorf("email or role in the token is tempered")
 	}
 }

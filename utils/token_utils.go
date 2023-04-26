@@ -12,12 +12,12 @@ type ClaimsKey int
 
 var claimsKey ClaimsKey
 
-func SetJWTClaimsContext(ctx context.Context, claims jwt.MapClaims) context.Context {
+func SetJWTClaimsContext(ctx context.Context, claims UserClaims) context.Context {
 	return context.WithValue(ctx, claimsKey, claims)
 }
 
-func JWTClaimsFromContext(ctx context.Context) (jwt.MapClaims, bool) {
-	claims, ok := ctx.Value(claimsKey).(jwt.MapClaims)
+func JWTClaimsFromContext(ctx context.Context) (*UserClaims, bool) {
+	claims, ok := ctx.Value(claimsKey).(*UserClaims)
 	return claims, ok
 }
 
@@ -28,8 +28,8 @@ type UserClaims struct {
 }
 
 var (
-	Issuer      = "https://anwararif.com"
-	ServiceName = "go-rest-api"
+	Issuer   = "https://anwararif.com"
+	Audience = "go-rest-api"
 )
 
 func GenerateToken(user *model.User, secretKey string) (string, error) {
@@ -40,7 +40,7 @@ func GenerateToken(user *model.User, secretKey string) (string, error) {
 			NotBefore: jwt.NewNumericDate(time.Now().Add(time.Millisecond * -1)),
 			Subject:   user.UserName,
 			Issuer:    Issuer,
-			Audience:  []string{ServiceName},
+			Audience:  []string{Audience},
 		},
 		user.Email,
 		user.Role,
@@ -59,15 +59,14 @@ func GenerateToken(user *model.User, secretKey string) (string, error) {
 	return token, nil
 }
 
-func GetClaimsFromToken(tokenString string, secretKey string) (jwt.MapClaims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+func GetClaimsFromToken(tokenString string, secretKey string) (*UserClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
+		if _, ok := token.Claims.(*UserClaims); !ok && !token.Valid {
 			return nil, response.TokenExpired
 		}
-
 		issuer, err := token.Claims.GetIssuer()
 		if (err != nil) || (issuer != Issuer) {
 			return nil, jwt.ErrTokenInvalidIssuer
@@ -79,7 +78,7 @@ func GetClaimsFromToken(tokenString string, secretKey string) (jwt.MapClaims, er
 		return nil, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*UserClaims); ok && token.Valid {
 		return claims, nil
 	}
 

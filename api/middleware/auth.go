@@ -28,6 +28,7 @@ func AuthenticatedOnly(next http.Handler) http.Handler {
 
 			claims, err := utils.GetClaimsFromToken(jwtToken, apiSecretKey)
 			if err != nil {
+				log.Println("error while getClaimsFromToken: ", err.Error())
 				_ = response.Serve(w, http.StatusUnauthorized, "user could not be authenticated", nil)
 				return
 			}
@@ -46,7 +47,7 @@ func AuthenticatedOnly(next http.Handler) http.Handler {
 				r.Header.Set(utils.RealUserIpKey, ip)
 			}
 
-			r = r.WithContext(utils.SetJWTClaimsContext(r.Context(), claims))
+			r = r.WithContext(utils.SetJWTClaimsContext(r.Context(), *claims))
 
 			next.ServeHTTP(w, r)
 		} else if secretKey != "" {

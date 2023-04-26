@@ -137,8 +137,7 @@ func (uc *usersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if claims, ok := utils.JWTClaimsFromContext(r.Context()); ok {
-		email := claims["email"].(string)
-		if email != getByEmailReq.Email {
+		if claims.Email != getByEmailReq.Email {
 			_ = response.Serve(w, http.StatusUnauthorized, "unauthorized access", nil)
 			return
 		}
