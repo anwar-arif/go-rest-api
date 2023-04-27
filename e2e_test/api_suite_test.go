@@ -3,7 +3,7 @@ package e2e_test
 import (
 	"context"
 	"flag"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/viper"
 	"go-rest-api/config"

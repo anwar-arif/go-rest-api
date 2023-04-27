@@ -3,7 +3,7 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go-rest-api/e2e_test/framework"
 	"io/ioutil"
