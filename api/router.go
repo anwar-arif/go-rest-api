@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-rest-api/api/controller"
 	"go-rest-api/config"
-	"go-rest-api/infra/mongo"
+	"go-rest-api/infra/db"
 	"io"
 	"net/http"
 	"time"
@@ -24,7 +24,7 @@ func SetLogger(l logger.Logger) {
 }
 
 // NewApiRouter ..
-func NewApiRouter(cfgDBTable *config.Table, db *mongo.Mongo, logger logger.StructLogger) http.Handler {
+func NewApiRouter(cfgDBTable *config.Table, db *infra.DB, logger logger.StructLogger) http.Handler {
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger(lgr))

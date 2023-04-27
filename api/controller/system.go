@@ -3,21 +3,21 @@ package controller
 import (
 	"context"
 	"fmt"
+	"go-rest-api/infra/db"
 	"log"
 	"net/http"
 	"time"
 
 	"go-rest-api/api/response"
-	"go-rest-api/infra"
 )
 
 // SystemController ..
 type SystemController struct {
-	db infra.DB
+	db *infra.DB
 }
 
 // NewSystemController ..
-func NewSystemController(db infra.DB) *SystemController {
+func NewSystemController(db *infra.DB) *SystemController {
 	return &SystemController{
 		db: db,
 	}
@@ -46,7 +46,7 @@ func (s *SystemController) ConnCheck() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	log.Println("db ping")
-	if err := s.db.Ping(ctx); err != nil {
+	if err := s.db.Mongo.Ping(ctx); err != nil {
 		return fmt.Errorf("mongo conn error: %v", err)
 	}
 

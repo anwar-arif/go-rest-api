@@ -7,6 +7,7 @@ import (
 
 var (
 	user = model.User{
+		UserID:   "",
 		UserName: "Anwar35",
 		Email:    "anwararif727@gmail.com",
 		Role:     "admin",

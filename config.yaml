@@ -13,6 +13,10 @@ mongo:
   url: mongodb://root:secret@app_mongo:27017
   db_name: boilerplate
   time_out: 30
+redis:
+  url: redis:6379
+  db_id: 0
+  time_out: 30
 collection:
   brand: brands
   user: users

@@ -99,7 +99,7 @@ func (d *Mongo) Close(ctx context.Context) error {
 }
 
 // EnsureIndices creates indices for collection col
-func (d *Mongo) EnsureIndices(ctx context.Context, col string, inds []infra.DbIndex) error {
+func (d *Mongo) EnsureIndices(ctx context.Context, col string, inds []DbIndex) error {
 	log.Println("creating indices for", col)
 	db := d.database
 	indexModels := []mongo.IndexModel{}
@@ -134,7 +134,7 @@ func (d *Mongo) EnsureIndices(ctx context.Context, col string, inds []infra.DbIn
 }
 
 // DropIndices drops indices from collection col
-func (d *Mongo) DropIndices(ctx context.Context, col string, inds []infra.DbIndex) error {
+func (d *Mongo) DropIndices(ctx context.Context, col string, inds []DbIndex) error {
 	d.println("dropping indices from", col)
 	if _, err := d.database.Collection(col).Indexes().DropAll(ctx); err != nil {
 		return err
@@ -162,7 +162,7 @@ func (d *Mongo) InsertMany(ctx context.Context, col string, docs []interface{}) 
 }
 
 // FindOne finds a doc by query
-func (d *Mongo) FindOne(ctx context.Context, col string, q infra.DbQuery, v interface{}, sort ...interface{}) error {
+func (d *Mongo) FindOne(ctx context.Context, col string, q DbQuery, v interface{}, sort ...interface{}) error {
 	d.println("find", q, "from", col)
 	findOneOpts := options.FindOne()
 	if len(sort) > 0 {
@@ -179,7 +179,7 @@ func (d *Mongo) FindOne(ctx context.Context, col string, q infra.DbQuery, v inte
 }
 
 // List finds list of docs that matches query with skip and limit
-func (d *Mongo) List(ctx context.Context, col string, filter infra.DbQuery, skip, limit int64, v interface{}, sort ...interface{}) error {
+func (d *Mongo) List(ctx context.Context, col string, filter DbQuery, skip, limit int64, v interface{}, sort ...interface{}) error {
 	d.println("list", filter, "from", col)
 	findOpts := options.Find().SetSkip(skip).SetLimit(limit)
 	if len(sort) > 0 {
@@ -197,7 +197,7 @@ func (d *Mongo) List(ctx context.Context, col string, filter infra.DbQuery, skip
 }
 
 // Aggregate runs aggregation q on docs and store the result on v
-func (d *Mongo) Aggregate(ctx context.Context, col string, q []infra.DbQuery, v interface{}) error {
+func (d *Mongo) Aggregate(ctx context.Context, col string, q []DbQuery, v interface{}) error {
 	d.println("aggregate", q, "from", col)
 	cursor, err := d.database.Collection(col).Aggregate(ctx, q)
 	if err != nil {
@@ -209,7 +209,7 @@ func (d *Mongo) Aggregate(ctx context.Context, col string, q []infra.DbQuery, v 
 	return nil
 }
 
-func (d *Mongo) AggregateWithDiskUse(ctx context.Context, col string, q []infra.DbQuery, v interface{}) error {
+func (d *Mongo) AggregateWithDiskUse(ctx context.Context, col string, q []DbQuery, v interface{}) error {
 	d.println("aggregate", q, "from", col)
 	opt := options.Aggregate().SetAllowDiskUse(true)
 	cursor, err := d.database.Collection(col).Aggregate(ctx, q, opt)
@@ -222,7 +222,7 @@ func (d *Mongo) AggregateWithDiskUse(ctx context.Context, col string, q []infra.
 	return nil
 }
 
-func (d *Mongo) Distinct(ctx context.Context, col, field string, q infra.DbQuery, v interface{}) error {
+func (d *Mongo) Distinct(ctx context.Context, col, field string, q DbQuery, v interface{}) error {
 	d.println("aggregate", q, "from", col)
 	interfaces, err := d.database.Collection(col).Distinct(ctx, field, q)
 	if err != nil {
@@ -235,7 +235,7 @@ func (d *Mongo) Distinct(ctx context.Context, col, field string, q infra.DbQuery
 	return json.Unmarshal(data, v)
 }
 
-func (d *Mongo) PartialUpdateMany(ctx context.Context, col string, filter infra.DbQuery, data interface{}) error {
+func (d *Mongo) PartialUpdateMany(ctx context.Context, col string, filter DbQuery, data interface{}) error {
 	_, err := d.database.Collection(col).UpdateMany(ctx, filter, bson.M{"$set": data})
 	if err != nil {
 		return err
@@ -243,7 +243,7 @@ func (d *Mongo) PartialUpdateMany(ctx context.Context, col string, filter infra.
 	return nil
 }
 
-func (d *Mongo) PartialUpdateManyByQuery(ctx context.Context, col string, filter infra.DbQuery, query infra.UnorderedDbQuery) error {
+func (d *Mongo) PartialUpdateManyByQuery(ctx context.Context, col string, filter DbQuery, query UnorderedDbQuery) error {
 	_, err := d.database.Collection(col).UpdateMany(ctx, filter, query)
 	if err != nil {
 		return err

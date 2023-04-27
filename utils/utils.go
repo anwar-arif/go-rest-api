@@ -12,6 +12,7 @@ import (
 	"hash"
 	"math"
 	"math/rand"
+	"net/http"
 	"strings"
 	"sync/atomic"
 )
@@ -68,6 +69,15 @@ func HashPassword(password string, salt string) string {
 func IsSamePassword(hashedPassword, currentPassword string, salt string) bool {
 	currentPasswordHash := HashPassword(currentPassword, salt)
 	return hashedPassword == currentPasswordHash
+}
+
+func GetKeyFromHeader(r *http.Request, key string) string {
+	return r.Header.Get(key)
+}
+
+func GetAuthTokenFromHeader(r *http.Request) string {
+	bearer := GetKeyFromHeader(r, AuthorizationKey)
+	return strings.TrimPrefix(bearer, "Bearer ")
 }
 
 /*-----------------------------------------------*/

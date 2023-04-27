@@ -3,7 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"go-rest-api/config"
-	"go-rest-api/infra/mongo"
+	"go-rest-api/infra/db"
 	"go-rest-api/repo"
 	"net/http"
 
@@ -26,7 +26,7 @@ type brandsController struct {
 }
 
 // NewBrandsController ...
-func NewBrandsController(cfgDBTable *config.Table, db *mongo.Mongo, lgr logger.StructLogger) BrandsController {
+func NewBrandsController(cfgDBTable *config.Table, db *infra.DB, lgr logger.StructLogger) BrandsController {
 	brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
 	svc := service.NewBrandService(lgr, brandRepo)
 

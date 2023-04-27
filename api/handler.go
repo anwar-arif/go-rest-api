@@ -28,6 +28,7 @@ func usersRouter(ctrl controller.UsersController) http.Handler {
 	h.Group(func(r chi.Router) {
 		r.Use(middleware.AuthenticatedOnly)
 		r.Get("/", ctrl.GetByEmail)
+		r.Post("/logout", ctrl.LogOut)
 	})
 	return h
 }

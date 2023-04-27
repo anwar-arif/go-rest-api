@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"go-rest-api/api/response"
 	"go-rest-api/config"
 	"go-rest-api/infra"
-	"go-rest-api/infra/mongo"
+	infra2 "go-rest-api/infra/db"
 	"go-rest-api/logger"
 	"go-rest-api/model"
 	"go-rest-api/repo"
@@ -18,6 +20,7 @@ import (
 type UsersController interface {
 	CreateUser(w http.ResponseWriter, r *http.Request)
 	LogIn(w http.ResponseWriter, r *http.Request)
+	LogOut(w http.ResponseWriter, r *http.Request)
 	GetByEmail(w http.ResponseWriter, r *http.Request)
 }
 
@@ -26,7 +29,7 @@ type usersController struct {
 	lgr logger.StructLogger
 }
 
-func NewUsersController(cfgDBTable *config.Table, db *mongo.Mongo, lgr logger.StructLogger) UsersController {
+func NewUsersController(cfgDBTable *config.Table, db *infra2.DB, lgr logger.StructLogger) UsersController {
 	userRepo := repo.NewUser(cfgDBTable.UserCollectionName, db)
 	userService := service.NewUserService(lgr, userRepo)
 
@@ -40,15 +43,15 @@ func (uc *usersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	fn := "CreateUser"
 	tid := utils.GetTracingID(r.Context())
 
-	var u *model.User
-	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+	var signUpReq *model.SignUpRequest
+	if err := json.NewDecoder(r.Body).Decode(&signUpReq); err != nil {
 		uc.lgr.Errorf(fn, tid, "error while parsing user payload: %v\n", err.Error())
 		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage(), nil)
 		return
 	}
 
 	// user exists with same email
-	existingUser, err := uc.svc.GetUserByEmail(r.Context(), &u.Email)
+	existingUser, err := uc.svc.GetUserByEmail(r.Context(), &signUpReq.Email)
 	if (err != nil) && (err.Error() != infra.ErrNotFound.Error()) {
 		uc.lgr.Errorf(fn, tid, "error while fetching user: %v\n", err.Error())
 		_ = response.Serve(w, http.StatusInternalServerError, "failed to create user", nil)
@@ -68,8 +71,16 @@ func (uc *usersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	u := &model.User{
+		UserName: signUpReq.UserName,
+		Email:    signUpReq.Email,
+	}
+
 	u.Salt = *salt
-	u.Password = utils.HashPassword(u.Password, u.Salt)
+	u.Password = utils.HashPassword(signUpReq.Password, u.Salt)
+	u.UserID = uuid.New().String()
+
+	uc.lgr.Printf(fn, tid, "user id: ", u.UserID)
 
 	if err := uc.svc.CreateUser(r.Context(), u); err != nil {
 		uc.lgr.Errorln(fn, tid, err.Error())
@@ -77,7 +88,7 @@ func (uc *usersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = response.Serve(w, http.StatusCreated, http.StatusText(http.StatusCreated), &model.GetUserByEmailResponse{
+	_ = response.Serve(w, http.StatusCreated, http.StatusText(http.StatusCreated), &model.SignUpResponse{
 		UserName: u.UserName,
 		Email:    u.Email,
 	})
@@ -103,7 +114,7 @@ func (uc *usersController) LogIn(w http.ResponseWriter, r *http.Request) {
 
 	if au == nil {
 		uc.lgr.Errorln(fn, tid, response.UserNotFound)
-		_ = response.Serve(w, http.StatusNotFound, response.InvalidCredential, nil)
+		_ = response.Serve(w, http.StatusNotFound, response.UserNotFound, nil)
 		return
 	}
 
@@ -116,13 +127,50 @@ func (uc *usersController) LogIn(w http.ResponseWriter, r *http.Request) {
 	// generate access token
 	viper.AutomaticEnv()
 	secretKey := viper.GetString("app.api_secret_key")
+	expiresIn := viper.GetInt64("app.access_token_expires_in")
+	uc.lgr.Printf(fn, tid, "expiresIn: %v", expiresIn)
+
 	token, err := utils.GenerateToken(au.ToUser(), secretKey)
 
+	// store token
+	if err := uc.svc.StoreToken(r.Context(), au.Email, token); err != nil {
+		uc.lgr.Println(fn, tid, utils.TokenCantStore)
+		_ = response.Serve(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		return
+	}
 	// return success response
 	_ = response.Serve(w, http.StatusOK, response.Successful, model.LoginResponse{
 		Email:       au.Email,
 		AccessToken: token,
 	})
+	return
+}
+
+func (uc *usersController) LogOut(w http.ResponseWriter, r *http.Request) {
+	fn := "LogOut"
+	tid := utils.GetTracingID(r.Context())
+
+	var logOutReq *model.LogOutRequest
+	if err := json.NewDecoder(r.Body).Decode(&logOutReq); err != nil {
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage("email"), nil)
+		return
+	}
+
+	_, cerr := utils.ClaimsFromRequest(r)
+	if cerr != nil {
+		uc.lgr.Errorln(fn, tid, cerr.Error())
+		_ = response.Serve(w, http.StatusBadRequest, utils.CantProcessRequest, nil)
+		return
+	}
+
+	if err := uc.svc.RemoveToken(r.Context(), logOutReq.Email); err != nil {
+		uc.lgr.Errorln(fn, tid, err.Error())
+		_ = response.Serve(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		return
+	}
+
+	_ = response.Serve(w, http.StatusOK, utils.LogoutSuccessful, nil)
 	return
 }
 
@@ -135,12 +183,25 @@ func (uc *usersController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 		_ = response.Serve(w, http.StatusBadRequest, utils.RequiredFieldMessage("email"), nil)
 		return
 	}
-
-	if claims, ok := utils.JWTClaimsFromContext(r.Context()); ok {
-		if claims.Email != getByEmailReq.Email {
-			_ = response.Serve(w, http.StatusUnauthorized, "unauthorized access", nil)
-			return
+	claims, claimsErr := utils.ClaimsFromRequest(r)
+	if (claimsErr != nil) || (claims.Email != getByEmailReq.Email) {
+		if claims != nil {
+			uc.lgr.Printf(fn, tid, claims.Email)
 		}
+		uc.lgr.Errorln(fn, tid, fmt.Sprintf("%s: %s", utils.UnAuthorizedAccess, claimsErr.Error()))
+		_ = response.Serve(w, http.StatusUnauthorized, utils.UnAuthorizedAccess, nil)
+		return
+	}
+
+	tokenInReq := utils.GetAuthTokenFromHeader(r)
+
+	// returns err when key doesn't exist
+	storedToken, tokenErr := uc.svc.GetToken(r.Context(), claims.Email)
+
+	if (tokenErr != nil) || (storedToken != tokenInReq) {
+		uc.lgr.Errorln(fn, tid, fmt.Sprintf("%s: %s", utils.TokenNotFound, tokenErr.Error()))
+		_ = response.Serve(w, http.StatusUnauthorized, utils.UnAuthorizedAccess, nil)
+		return
 	}
 
 	user, err := uc.svc.GetUserByEmail(r.Context(), &getByEmailReq.Email)

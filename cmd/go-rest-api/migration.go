@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	infra "go-rest-api/infra/db"
+	infraRedis "go-rest-api/infra/redis"
+	"go-rest-api/logger"
 	"log"
 
 	"go-rest-api/config"
@@ -20,16 +23,25 @@ var migrationRoot = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		cfgMongo := config.GetMongo(cfgPath)
 		cfgDBTable := config.GetTable(cfgPath)
+		cfgRedis := config.GetRedis(cfgPath)
 
 		ctx := context.Background()
 
-		//lgr := logger.DefaultOutStructLogger
+		lgr := logger.DefaultOutStructLogger
 
-		db, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+		mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
 		if err != nil {
 			return err
 		}
-		defer db.Close(ctx)
+		defer mgo.Close(ctx)
+
+		rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, lgr, cfgRedis.DBTimeOut)
+		if err != nil {
+			return err
+		}
+		defer rds.Close()
+
+		db := infra.NewDB(mgo, rds)
 
 		brandRepo := repo.NewBrand(cfgDBTable.BrandCollectionName, db)
 		userRepo := repo.NewUser(cfgDBTable.UserCollectionName, db)

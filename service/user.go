@@ -15,6 +15,9 @@ type UserService interface {
 	CreateUser(ctx context.Context, user *model.User) *response.Error
 	GetUserByEmail(ctx context.Context, email *string) (*model.GetUserByEmailResponse, *response.Error)
 	GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserData, error)
+	StoreToken(ctx context.Context, email string, token string) error
+	GetToken(ctx context.Context, key string) (string, error)
+	RemoveToken(ctx context.Context, key ...string) error
 }
 
 type userService struct {
@@ -56,10 +59,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email *string) (*model
 
 	s.log.Printf(fn, tid, "user found with email %v", *email)
 
-	return &model.GetUserByEmailResponse{
-		UserName: user.UserName,
-		Email:    user.Email,
-	}, nil
+	return user, nil
 }
 
 func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*model.AuthUserData, error) {
@@ -77,4 +77,46 @@ func (s *userService) GetAuthUserByEmail(ctx context.Context, email *string) (*m
 	s.log.Printf(fn, tid, "user found with email %v", *email)
 
 	return user, nil
+}
+
+func (s *userService) StoreToken(ctx context.Context, email string, token string) error {
+	fn := "StoreToken"
+	tid := utils.GetTracingID(ctx)
+
+	s.log.Println(fn, tid, "storing token")
+
+	if err := s.userRepo.StoreToken(ctx, email, token); err != nil {
+		s.log.Errorln(fn, tid, err.Error())
+		return err
+	}
+	return nil
+}
+
+func (s *userService) GetToken(ctx context.Context, key string) (string, error) {
+	fn := "GetToken"
+	tid := utils.GetTracingID(ctx)
+
+	s.log.Println(fn, tid, "fetching token")
+
+	value, err := s.userRepo.GetToken(ctx, key)
+
+	if err != nil {
+		s.log.Errorln(fn, tid, err.Error())
+		return "", err
+	}
+	return value, err
+}
+
+func (s *userService) RemoveToken(ctx context.Context, key ...string) error {
+	fn := "RemoveToken"
+	tid := utils.GetTracingID(ctx)
+
+	s.log.Println(fn, tid, "removing token")
+
+	if err := s.userRepo.RemoveToken(ctx, key...); err != nil {
+		s.log.Errorln(fn, tid, err.Error())
+		return err
+	}
+
+	return nil
 }

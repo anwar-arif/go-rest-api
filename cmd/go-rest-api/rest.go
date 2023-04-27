@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"go-rest-api/api/controller"
+	"go-rest-api/infra/db"
 	"log"
 	"net/http"
 	"os"
@@ -15,8 +16,8 @@ import (
 	"github.com/spf13/cobra"
 	"go-rest-api/api"
 	"go-rest-api/config"
-	"go-rest-api/infra"
 	infraMongo "go-rest-api/infra/mongo"
+	infraRedis "go-rest-api/infra/redis"
 	infraSentry "go-rest-api/infra/sentry"
 	"go-rest-api/logger"
 )
@@ -37,16 +38,25 @@ func serve(cmd *cobra.Command, args []string) error {
 	cfgMongo := config.GetMongo(cfgPath)
 	cfgSentry := config.GetSentry(cfgPath)
 	cfgDBTable := config.GetTable(cfgPath)
+	cfgRedis := config.GetRedis(cfgPath)
 
 	ctx := context.Background()
 
 	lgr := logger.DefaultOutStructLogger
 
-	db, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
 	if err != nil {
 		return err
 	}
-	defer db.Close(ctx)
+	defer mgo.Close(ctx)
+
+	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, lgr, cfgRedis.DBTimeOut)
+	if err != nil {
+		return err
+	}
+	defer rds.Close()
+
+	db := infra.NewDB(mgo, rds)
 
 	err = infraSentry.NewInit(cfgSentry.URL)
 	if err != nil {
@@ -71,7 +81,7 @@ func serve(cmd *cobra.Command, args []string) error {
 
 }
 
-func startHealthServer(cfg *config.Application, db infra.DB) error {
+func startHealthServer(cfg *config.Application, db *infra.DB) error {
 	log.Println("startHealthServer")
 	sc := controller.NewSystemController(db)
 	r := chi.NewMux()
@@ -111,7 +121,7 @@ func startHealthServer(cfg *config.Application, db infra.DB) error {
 	return <-errCh
 }
 
-func startApiServer(cfgApp *config.Application, cfgDBTable *config.Table, db *infraMongo.Mongo, lgr logger.StructLogger) error {
+func startApiServer(cfgApp *config.Application, cfgDBTable *config.Table, db *infra.DB, lgr logger.StructLogger) error {
 
 	r := chi.NewMux()
 	r.Mount("/api/v1", api.NewApiRouter(cfgDBTable, db, lgr))
@@ -138,8 +148,8 @@ func ManageServer(srvr *http.Server, gracePeriod time.Duration) error {
 	sigs := []os.Signal{syscall.SIGINT, syscall.SIGQUIT, syscall.SIGKILL, syscall.SIGTERM, os.Interrupt}
 
 	graceful := func() error {
-		log.Println("Suttingdown server gracefully with in", gracePeriod)
-		log.Println("To shutdown immedietly press again")
+		log.Println("Shutting down server gracefully with in", gracePeriod)
+		log.Println("To shutdown immediately press again")
 
 		ctx, cancel := context.WithTimeout(context.Background(), gracePeriod)
 		defer cancel()
