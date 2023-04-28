@@ -50,7 +50,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 	defer mgo.Close(ctx)
 
-	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, lgr, cfgRedis.DBTimeOut)
+	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
 	if err != nil {
 		return err
 	}

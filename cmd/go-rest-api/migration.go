@@ -35,7 +35,7 @@ var migrationRoot = &cobra.Command{
 		}
 		defer mgo.Close(ctx)
 
-		rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, lgr, cfgRedis.DBTimeOut)
+		rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
 		if err != nil {
 			return err
 		}

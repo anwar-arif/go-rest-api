@@ -10,25 +10,23 @@ import (
 	"net/http"
 )
 
-var (
-	client *framework.Framework
-)
-
 var _ = Describe("Ping Api", func() {
+	var f *framework.Framework
+
 	BeforeEach(func() {
-		client = framework.GetClient()
+		f = framework.GetFramework()
 	})
 
 	Context("Calling Ping", func() {
 		It("should return a ping response", func() {
-			req, err := http.NewRequest("GET", client.BaseURL, nil)
+			req, err := http.NewRequest(http.MethodGet, f.BaseURL, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			By(fmt.Sprintf("set %v authentication to header", framework.AuthenticationBearer))
-			SetAuthentication(req, client, framework.AuthenticationBearer)
+			//By(fmt.Sprintf("set %v authentication to header", framework.AuthenticationBearer))
+			//SetAuthentication(req, client, framework.AuthenticationBearer)
 
 			By("sending ping request")
-			resp, err := client.ApiClient.Do(req)
+			resp, err := f.ApiClient.Do(req)
 			Expect(err).NotTo(HaveOccurred())
 
 			body, err := ioutil.ReadAll(resp.Body)

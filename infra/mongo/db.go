@@ -24,6 +24,7 @@ type DB interface {
 	AggregateWithDiskUse(ctx context.Context, col string, q []DbQuery, v interface{}) error
 	Distinct(ctx context.Context, col, field string, q DbQuery, v interface{}) error
 	DeleteMany(ctx context.Context, col string, filter interface{}) error
+	DropDB(ctx context.Context) error
 }
 
 // DbIndex holds database index

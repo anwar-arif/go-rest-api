@@ -37,7 +37,7 @@ func NewApiRouter(cfgDBTable *config.Table, db *infra.DB, logger logger.StructLo
 
 	router.Route("/", func(r chi.Router) {
 		r.Mount("/brands", brandsRouter(controller.NewBrandsController(cfgDBTable, db, logger)))
-		r.Mount("/users", usersRouter(controller.NewUsersController(cfgDBTable, db, logger)))
+		r.Mount("/", usersRouter(controller.NewUsersController(cfgDBTable, db, logger)))
 	})
 	return router
 }

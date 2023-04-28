@@ -8,7 +8,7 @@ import (
 	"go-rest-api/api/response"
 	"go-rest-api/config"
 	"go-rest-api/infra"
-	infra2 "go-rest-api/infra/db"
+	infraDB "go-rest-api/infra/db"
 	"go-rest-api/logger"
 	"go-rest-api/model"
 	"go-rest-api/repo"
@@ -29,7 +29,7 @@ type usersController struct {
 	lgr logger.StructLogger
 }
 
-func NewUsersController(cfgDBTable *config.Table, db *infra2.DB, lgr logger.StructLogger) UsersController {
+func NewUsersController(cfgDBTable *config.Table, db *infraDB.DB, lgr logger.StructLogger) UsersController {
 	userRepo := repo.NewUser(cfgDBTable.UserCollectionName, db)
 	userService := service.NewUserService(lgr, userRepo)
 

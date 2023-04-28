@@ -14,7 +14,7 @@ type Redis struct {
 	lgr        logger.StructLogger
 }
 
-func New(ctx context.Context, uri string, databaseId int, lgr logger.StructLogger, timeout time.Duration) (*Redis, error) {
+func New(ctx context.Context, uri string, databaseId int, timeout time.Duration, lgr logger.StructLogger) (*Redis, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -60,5 +60,10 @@ func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 
 func (r *Redis) Del(ctx context.Context, keys ...string) error {
 	cmd := r.Client.Del(ctx, keys...)
+	return cmd.Err()
+}
+
+func (r *Redis) FlushDB(ctx context.Context) error {
+	cmd := r.Client.FlushDB(ctx)
 	return cmd.Err()
 }

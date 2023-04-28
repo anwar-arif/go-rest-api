@@ -98,6 +98,10 @@ func (d *Mongo) Close(ctx context.Context) error {
 	return d.Client.Disconnect(ctx)
 }
 
+func (d *Mongo) DropDB(ctx context.Context) error {
+	return d.database.Drop(ctx)
+}
+
 // EnsureIndices creates indices for collection col
 func (d *Mongo) EnsureIndices(ctx context.Context, col string, inds []DbIndex) error {
 	log.Println("creating indices for", col)
