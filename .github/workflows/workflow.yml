@@ -4,22 +4,21 @@ on:
   push:
     branches:
       - "PER-2-workflow-test"
+env:
+  GITHUB_WORKSPACE: /home/runner/work/go-rest-api/go-rest-api
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
-      - name: build docker image
+      - name: run containers
         run: |
-          docker build -t anr35/go-rest-api -f Dockerfile.dev .
-      - name: run backend server
-        run: |
-          docker run -e CI=true anr35/go-rest-api
+          docker-compose -f "docker-compose-dev.yml" up --build
       - name: run tests
         run: |
           cd e2e_test
           go test --config=../test.config.yaml -ginkgo.v
-      - name: stop server
+      - name: stop containers
         run: |
-          docker stop anr35/go-rest-api
+          docker-compose -f "docker-compose-dev.yml" down
