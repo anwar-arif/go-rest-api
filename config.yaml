@@ -10,7 +10,7 @@ app:
   auth_base_url:
     your_auth_base_url
 mongo:
-  url: mongodb://root:secret@app_mongo:27017
+  url: mongodb://root:secret@mongo:27017
   db_name: boilerplate
   time_out: 30
 redis:
