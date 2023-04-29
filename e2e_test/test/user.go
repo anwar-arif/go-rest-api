@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go-rest-api/e2e_test/framework"
 	"go-rest-api/model"
+	"go-rest-api/utils"
 	"io"
 	"net/http"
 )
@@ -16,12 +17,18 @@ var _ = Describe("user api", func() {
 	var f *framework.Framework
 	signUpReq := model.SignUpRequest{
 		UserName: "NightOwl",
-		Email:    "anwararif727@gmail.com",
+		Email:    "myemail@gmail.com",
 		Password: "my_password",
 	}
 	loginReq := model.LoginRequest{
-		Email:    "anwararif727@gmail.com",
+		Email:    "myemail@gmail.com",
 		Password: "my_password",
+	}
+	logOutReq := model.LogOutRequest{
+		Email: "myemail@gmail.com",
+	}
+	userByEmailReq := model.GetUserByEmailRequest{
+		Email: "myemail@gmail.com",
 	}
 
 	BeforeEach(func() {
@@ -33,11 +40,11 @@ var _ = Describe("user api", func() {
 
 		It("sign up should successful", func() {
 			var buf bytes.Buffer
-			signUpUrl := f.BaseURL + "/api/v1/signup"
+			url := f.BaseURL + "/api/v1/signup"
 			buffErr := json.NewEncoder(&buf).Encode(signUpReq)
 			Expect(buffErr).NotTo(HaveOccurred())
 
-			req, reqErr := http.NewRequest(http.MethodPost, signUpUrl, &buf)
+			req, reqErr := http.NewRequest(http.MethodPost, url, &buf)
 			Expect(reqErr).NotTo(HaveOccurred())
 
 			By("sending sign up request")
@@ -69,12 +76,12 @@ var _ = Describe("user api", func() {
 
 		It("login should successful", func() {
 			var buf bytes.Buffer
-			loginUrl := f.BaseURL + "/api/v1/login"
+			url := f.BaseURL + "/api/v1/login"
 
 			buffErr := json.NewEncoder(&buf).Encode(loginReq)
 			Expect(buffErr).NotTo(HaveOccurred())
 
-			req, reqErr := http.NewRequest(http.MethodPost, loginUrl, &buf)
+			req, reqErr := http.NewRequest(http.MethodPost, url, &buf)
 			Expect(reqErr).NotTo(HaveOccurred())
 
 			By("sending login request")
@@ -96,7 +103,6 @@ var _ = Describe("user api", func() {
 				Email:       respMap["email"].(string),
 				AccessToken: respMap["access_token"].(string),
 			}
-
 			accessToken = loginRespData.AccessToken
 
 			By(fmt.Sprintf("received response %v", res.Data))
@@ -104,6 +110,65 @@ var _ = Describe("user api", func() {
 			Expect(accessToken).NotTo(BeEmpty())
 
 			By("login successful")
+		})
+
+		It("should fetch logged in user data", func() {
+			var buf bytes.Buffer
+			url := f.BaseURL + "/api/v1/users"
+			buffErr := json.NewEncoder(&buf).Encode(userByEmailReq)
+			Expect(buffErr).NotTo(HaveOccurred())
+
+			req, reqErr := http.NewRequest(http.MethodGet, url, &buf)
+			Expect(reqErr).NotTo(HaveOccurred())
+
+			req.Header.Set(utils.AuthorizationKey, "Bearer "+accessToken)
+
+			resp, respErr := f.ApiClient.Do(req)
+			Expect(respErr).NotTo(HaveOccurred())
+			Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+			body, parseErr := io.ReadAll(resp.Body)
+			Expect(parseErr).NotTo(HaveOccurred())
+
+			var res ApiResponse
+			err := json.Unmarshal(body, &res)
+			Expect(err).NotTo(HaveOccurred())
+
+			respMap, ok := res.Data.(map[string]interface{})
+			Expect(ok).To(Equal(true))
+
+			userResponse := model.GetUserByEmailResponse{
+				Email: respMap["email"].(string),
+			}
+			Expect(userByEmailReq.Email).To(Equal(userResponse.Email))
+			By("get user by email successful")
+		})
+
+		It("should logout successful", func() {
+			var buf bytes.Buffer
+			url := f.BaseURL + "/api/v1/logout"
+			buffErr := json.NewEncoder(&buf).Encode(logOutReq)
+			Expect(buffErr).NotTo(HaveOccurred())
+
+			req, reqErr := http.NewRequest(http.MethodPost, url, &buf)
+			Expect(reqErr).NotTo(HaveOccurred())
+
+			req.Header.Set(utils.AuthorizationKey, "Bearer "+accessToken)
+
+			resp, respErr := f.ApiClient.Do(req)
+			Expect(respErr).NotTo(HaveOccurred())
+			Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+			body, parseErr := io.ReadAll(resp.Body)
+			Expect(parseErr).NotTo(HaveOccurred())
+
+			var res ApiResponse
+			err := json.Unmarshal(body, &res)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(res.Message).To(Equal(utils.LogoutSuccessful))
+			By("logout api successful")
+
 		})
 	})
 })
