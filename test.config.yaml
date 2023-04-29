@@ -12,11 +12,11 @@ app:
   access_token_expires_in:
     300
 mongo:
-  url: mongodb://localhost:27017
+  url: mongodb://mongo:27017
   db_name: boilerplate_test
   time_out: 30
 redis:
-  url: localhost:6379
+  url: redis:6379
   db_id: 1
   time_out: 30
 collection:
