@@ -12,7 +12,7 @@ app:
   access_token_expires_in:
     300
 mongo:
-  url: mongo:27017
+  url: mongodb://mongo:27017
   db_name: boilerplate_test
   time_out: 30
 redis:
