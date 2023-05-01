@@ -1,7 +1,6 @@
 package e2e_test
 
 import (
-	"context"
 	"flag"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -52,7 +51,7 @@ var _ = BeforeSuite(func() {
 
 	// Initialize api client with timeout
 	apiClient := &http.Client{Timeout: time.Minute * 2}
-	ctx := context.Background()
+	//ctx := context.Background()
 
 	// Initialize mongoDB
 	//mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
@@ -77,9 +76,9 @@ var _ = BeforeSuite(func() {
 	framework.Root = framework.New(apiClient, cfgApp, db, appBaseUrl)
 
 	// drop db if exists
-	By("dropping databases if exist")
-	dbErr := framework.Root.DropDB(ctx)
-	Expect(dbErr).NotTo(HaveOccurred())
+	//By("dropping databases if exist")
+	//dbErr := framework.Root.DropDB(ctx)
+	//Expect(dbErr).NotTo(HaveOccurred())
 	//By("going for login attempt")
 
 	//token := framework.GetBearerToken(framework.SecretData.UserName, framework.SecretData.Password)
