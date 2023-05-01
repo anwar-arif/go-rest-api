@@ -3,9 +3,9 @@ name: Github CI
 on:
   push:
     branches:
-      - "PER-2-workflow-test"
+      - "PER-2"
 jobs:
-  test:
+  build_and_upload_image:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
@@ -13,13 +13,13 @@ jobs:
       - name: build docker image
         run: |
           docker build -t anr35/go-rest-api -f Dockerfile.dev .
-      - name: run backend server
+      - name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_ID }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          docker run -e CI=true anr35/go-rest-api
-      - name: run tests
+          echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER --password-stdin
+      - name: push to docker hub
         run: |
-          cd e2e_test
-          go test --config=../test.config.yaml -ginkgo.v
-      - name: stop server
-        run: |
-          docker stop anr35/go-rest-api
+          docker push anr35/go-rest-api
+
