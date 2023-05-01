@@ -17,6 +17,8 @@ services:
   redis:
     image: redis:7.0.11
     restart: always
+    ports:
+      - "6379:6379"
     expose:
       - "6379"
     environment:
