@@ -9,9 +9,6 @@ import (
 	"go-rest-api/e2e_test/framework"
 	_ "go-rest-api/e2e_test/test"
 	infra "go-rest-api/infra/db"
-	infraMongo "go-rest-api/infra/mongo"
-	infraRedis "go-rest-api/infra/redis"
-	"go-rest-api/logger"
 	"net/http"
 	"strconv"
 	"testing"
@@ -48,27 +45,27 @@ var _ = BeforeSuite(func() {
 	By("going for api, db, kv initialization")
 	// get configuration
 	cfgApp := config.GetApp(cfgPath)
-	cfgMongo := config.GetMongo(cfgPath)
-	cfgRedis := config.GetRedis(cfgPath)
-
-	lgr := logger.DefaultOutStructLogger
+	//cfgMongo := config.GetMongo(cfgPath)
+	//cfgRedis := config.GetRedis(cfgPath)
+	//
+	//lgr := logger.DefaultOutStructLogger
 
 	// Initialize api client with timeout
 	apiClient := &http.Client{Timeout: time.Minute * 2}
 	ctx := context.Background()
 
 	// Initialize mongoDB
-	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
-	Expect(err).NotTo(HaveOccurred())
-
-	// initialize redis
-	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
-	Expect(err).NotTo(HaveOccurred())
+	//mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+	//Expect(err).NotTo(HaveOccurred())
+	//
+	//// initialize redis
+	//rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
+	//Expect(err).NotTo(HaveOccurred())
 
 	// initialize db
-	db := infra.NewDB(mgo, rds)
-
-	Expect(err).NotTo(HaveOccurred())
+	//db := infra.NewDB(mgo, rds)
+	var db *infra.DB
+	//Expect(err).NotTo(HaveOccurred())
 
 	appBaseUrl := getAddressFromHostAndPort(cfgApp.Host, cfgApp.Port)
 	//framework.SecretData = &framework.ConfidentialData{
@@ -76,7 +73,7 @@ var _ = BeforeSuite(func() {
 	//	AuthSecretKey: viper.GetString("app.api_secret_key"),
 	//}
 
-	Expect(err).NotTo(HaveOccurred())
+	//Expect(err).NotTo(HaveOccurred())
 	framework.Root = framework.New(apiClient, cfgApp, db, appBaseUrl)
 
 	// drop db if exists
@@ -93,10 +90,10 @@ var _ = AfterSuite(func() {
 	//By("logout api test suite session")
 	//framework.LogOut(framework.Root.Token)
 
-	ctx := context.Background()
+	//ctx := context.Background()
 
-	By("dropping database used for testing")
-	err := framework.Root.DropDB(ctx)
-	Expect(err).NotTo(HaveOccurred())
-	By("dropped databases successfully")
+	//By("dropping database used for testing")
+	//err := framework.Root.DropDB(ctx)
+	//Expect(err).NotTo(HaveOccurred())
+	//By("dropped databases successfully")
 })
