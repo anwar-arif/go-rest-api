@@ -1,6 +1,7 @@
 package e2e_test
 
 import (
+	"context"
 	"flag"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -8,6 +9,9 @@ import (
 	"go-rest-api/e2e_test/framework"
 	_ "go-rest-api/e2e_test/test"
 	infra "go-rest-api/infra/db"
+	infraMongo "go-rest-api/infra/mongo"
+	infraRedis "go-rest-api/infra/redis"
+	"go-rest-api/logger"
 	"net/http"
 	"strconv"
 	"testing"
@@ -48,7 +52,6 @@ var _ = BeforeSuite(func() {
 	// Initialize api client with timeout
 	apiClient := &http.Client{Timeout: time.Minute * 2}
 
-	/* ----TODO: uncomment this section and connect to db container and drop db in afterTest suit
 	cfgMongo := config.GetMongo(cfgPath)
 	cfgRedis := config.GetRedis(cfgPath)
 
@@ -67,20 +70,14 @@ var _ = BeforeSuite(func() {
 	// initialize db
 	db := infra.NewDB(mgo, rds)
 
-	*/
-
 	appBaseUrl := getAddressFromHostAndPort(cfgApp.Host, cfgApp.Port)
-
-	var db *infra.DB
 
 	framework.Root = framework.New(apiClient, cfgApp, db, appBaseUrl)
 
-	/* -- TODO: uncomment to drop db if exist before test suit
 	// drop db if exists
 	By("dropping databases if exist")
 	dbErr := framework.Root.DropDB(ctx)
 	Expect(dbErr).NotTo(HaveOccurred())
-	*/
 
 })
 
@@ -88,12 +85,10 @@ var _ = AfterSuite(func() {
 	//By("logout api test suite session")
 	//framework.LogOut(framework.Root.Token)
 
-	/* TODO: drop db after test suit
 	ctx := context.Background()
 
 	By("dropping database used for testing")
 	err := framework.Root.DropDB(ctx)
 	Expect(err).NotTo(HaveOccurred())
 	By("dropped databases successfully")
-	*/
 })
