@@ -3,6 +3,7 @@ package e2e_test
 import (
 	"context"
 	"flag"
+	"fmt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go-rest-api/config"
@@ -60,6 +61,7 @@ var _ = BeforeSuite(func() {
 	ctx := context.Background()
 
 	// Initialize mongoDB
+	By(fmt.Sprintf("mongo config: %v", cfgMongo))
 	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
 	Expect(err).NotTo(HaveOccurred())
 
