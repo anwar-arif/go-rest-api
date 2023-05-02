@@ -16,7 +16,7 @@ mongo:
   db_name: boilerplate_test
   time_out: 30
 redis:
-  url: redis:6379
+  url: localhost:6379
   db_id: 1
   time_out: 30
 collection:

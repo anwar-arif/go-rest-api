@@ -60,11 +60,16 @@ var _ = BeforeSuite(func() {
 
 	// Initialize mongoDB
 	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
-	By(fmt.Sprintf("err in mgo: %s", err.Error()))
+	if err != nil {
+		By(fmt.Sprintf("err in mongo: %s", err.Error()))
+	}
 	Expect(err).NotTo(HaveOccurred())
 
 	// initialize redis
 	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
+	if err != nil {
+		By(fmt.Sprintf("err in redis: %s", err.Error()))
+	}
 	Expect(err).NotTo(HaveOccurred())
 
 	// initialize db
