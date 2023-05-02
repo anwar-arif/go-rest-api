@@ -6,7 +6,6 @@ RUN apk add --no-cache --update git
 
 # Set GOPATH to build Go app
 ENV GOPATH=/go
-ENV GOBIN=/go/bin
 
 # Set apps source directory
 ENV SRC_DIR=${GOPATH}/src/go-rest-api
@@ -20,9 +19,6 @@ COPY . ${SRC_DIR}
 # Build App
 RUN ./build.sh
 
-# Install ginkgo
-RUN go install github.com/onsi/ginkgo/v2/ginkgo
-
 # Defining App image
 FROM alpine:latest
 
@@ -30,13 +26,9 @@ RUN apk add --no-cache --update ca-certificates
 
 # Copy App binary to image
 COPY --from=builder /go/bin/go-rest-api /usr/local/bin/go-rest-api
-COPY config.yml config.yml
-
-# Copy go and ginkgo binary
-COPY --from=builder /usr/local/go/bin/go /usr/local/bin/go
-COPY --from=builder /go/bin/ginkgo /usr/local/bin/ginkgo
+COPY dev.config.yml dev.config.yml
 
 EXPOSE 8000
 
 ENTRYPOINT ["go-rest-api"]
-CMD ["serve-rest", "-c", "config.yml"]
+CMD ["serve-rest", "-c", "dev.config.yml"]

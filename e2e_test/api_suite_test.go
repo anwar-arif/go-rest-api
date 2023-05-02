@@ -9,9 +9,6 @@ import (
 	"go-rest-api/e2e_test/framework"
 	_ "go-rest-api/e2e_test/test"
 	infra "go-rest-api/infra/db"
-	infraMongo "go-rest-api/infra/mongo"
-	infraRedis "go-rest-api/infra/redis"
-	"go-rest-api/logger"
 	"net/http"
 	"strconv"
 	"testing"
@@ -48,13 +45,16 @@ var _ = BeforeSuite(func() {
 	By("going for api, db, kv initialization")
 	// get configuration
 	cfgApp := config.GetApp(cfgPath)
+
+	// Initialize api client with timeout
+	apiClient := &http.Client{Timeout: time.Minute * 2}
+
+	/* ----TODO: uncomment this section and connect to db container and drop db in afterTest suit
 	cfgMongo := config.GetMongo(cfgPath)
 	cfgRedis := config.GetRedis(cfgPath)
 
 	lgr := logger.DefaultOutStructLogger
 
-	// Initialize api client with timeout
-	apiClient := &http.Client{Timeout: time.Minute * 2}
 	ctx := context.Background()
 
 	// Initialize mongoDB
@@ -68,25 +68,21 @@ var _ = BeforeSuite(func() {
 	// initialize db
 	db := infra.NewDB(mgo, rds)
 
-	Expect(err).NotTo(HaveOccurred())
+	*/
 
 	appBaseUrl := getAddressFromHostAndPort(cfgApp.Host, cfgApp.Port)
-	//framework.SecretData = &framework.ConfidentialData{
-	//	AuthBaseURL:   viper.GetString("app.auth_base_url") + "/api/v1/auth",
-	//	AuthSecretKey: viper.GetString("app.api_secret_key"),
-	//}
 
-	Expect(err).NotTo(HaveOccurred())
+	var db *infra.DB
+
 	framework.Root = framework.New(apiClient, cfgApp, db, appBaseUrl)
 
+	/* -- TODO: uncomment to drop db if exist before test suit
 	// drop db if exists
 	By("dropping databases if exist")
 	dbErr := framework.Root.DropDB(ctx)
 	Expect(dbErr).NotTo(HaveOccurred())
-	//By("going for login attempt")
-
-	//token := framework.GetBearerToken(framework.SecretData.UserName, framework.SecretData.Password)
-	//framework.Root.Token = token
+	*/
+	
 })
 
 var _ = AfterSuite(func() {

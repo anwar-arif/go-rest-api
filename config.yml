@@ -9,6 +9,8 @@ app:
     your_api_secret_key
   auth_base_url:
     your_auth_base_url
+  access_token_expires_in:
+    300
 mongo:
   url: mongodb://root:secret@mongo:27017
   db_name: boilerplate
