@@ -55,7 +55,7 @@ var migrationRoot = &cobra.Command{
 	}}
 
 func init() {
-	migrationRoot.PersistentFlags().StringVarP(&cfgPath, "config", "c", "config.yaml", "config file path")
+	migrationRoot.PersistentFlags().StringVarP(&cfgPath, "config", "c", "config.yml", "config file path")
 }
 
 var migrationUp = &cobra.Command{

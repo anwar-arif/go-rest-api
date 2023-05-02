@@ -33,8 +33,8 @@ services:
       - mongo
       - redis
     volumes:
-      - ./test.config.yml:/etc/go-rest-api/app.config.yaml
+      - ./test.config.yml:/etc/go-rest-api/app.config.yml
     ports:
       - "8000:8000"
       - "3550:3550"
-    command: 'serve-rest --config /etc/go-rest-api/app.config.yaml'
+    command: 'serve-rest --config /etc/go-rest-api/app.config.yml'
