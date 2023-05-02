@@ -1,7 +1,6 @@
 package e2e_test
 
 import (
-	"context"
 	"flag"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -82,17 +81,19 @@ var _ = BeforeSuite(func() {
 	dbErr := framework.Root.DropDB(ctx)
 	Expect(dbErr).NotTo(HaveOccurred())
 	*/
-	
+
 })
 
 var _ = AfterSuite(func() {
 	//By("logout api test suite session")
 	//framework.LogOut(framework.Root.Token)
 
+	/* TODO: drop db after test suit
 	ctx := context.Background()
 
 	By("dropping database used for testing")
 	err := framework.Root.DropDB(ctx)
 	Expect(err).NotTo(HaveOccurred())
 	By("dropped databases successfully")
+	*/
 })
