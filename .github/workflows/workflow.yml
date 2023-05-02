@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v2
       - name: build docker image
         run: |
-          docker build -t anr35/go-rest-api -f Dockerfile.dev .
+          docker build -t anr35/go-rest-api -f Dockerfile .
       - name: docker login
         env:
           DOCKER_ID: ${{ secrets.DOCKER_ID }}
