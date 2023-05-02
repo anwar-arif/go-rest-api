@@ -1,9 +1,15 @@
-name: Github CI
+name: Go-rest-api CI
 
 on:
   push:
     branches:
-      - "PER-2"
+      - "master"
+      - "develop"
+  pull_request:
+    branches:
+      - "master"
+      - "develop"
+
 env:
   GITHUB_WORKSPACE: /home/runner/work/go-rest-api/go-rest-api
 
