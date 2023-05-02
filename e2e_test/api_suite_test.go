@@ -30,7 +30,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&cfgPath, "config", "test.config.yaml", "config file path")
+	flag.StringVar(&cfgPath, "config", "../test.config.yml", "config file path")
 }
 
 func getAddressFromHostAndPort(host string, port int) string {
