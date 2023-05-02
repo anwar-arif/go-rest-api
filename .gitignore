@@ -53,5 +53,5 @@ vendor/
 storage/
 
 # Config
-#config.yaml
-#test.config.yaml
+#config.yml
+#test.config.yml

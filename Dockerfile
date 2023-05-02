@@ -26,9 +26,9 @@ RUN apk add --no-cache --update ca-certificates
 
 # Copy App binary to image
 COPY --from=builder /go/bin/go-rest-api /usr/local/bin/go-rest-api
-COPY config.yaml config.yaml
+COPY config.yml config.yml
 
 EXPOSE 8000
 
 ENTRYPOINT ["go-rest-api"]
-CMD ["serve-rest", "-c", "config.yaml"]
+CMD ["serve-rest", "-c", "config.yml"]
