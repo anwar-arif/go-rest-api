@@ -27,13 +27,13 @@ services:
 
   backend:
     build:
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.test
       context: .
     depends_on:
       - mongo
       - redis
     volumes:
-      - ./dev.config.yaml:/etc/go-rest-api/app.config.yaml
+      - ./test.config.yaml:/etc/go-rest-api/app.config.yaml
     ports:
       - "8000:8000"
       - "3550:3550"

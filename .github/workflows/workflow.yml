@@ -5,7 +5,36 @@ on:
     branches:
       - "PER-2"
 jobs:
+  integration_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: run containers
+        run: |
+          docker-compose -f "docker-compose-test.yml" up -d --build
+
+      - name: setup golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.1'
+
+      - name: install dependencies
+        run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: run tests
+        run: |
+          cd e2e_test
+          go test --config=../test.config.yml -ginkgo.v
+
+      - name: stop containers
+        run: |
+          docker-compose -f "docker-compose-test.yml" down
+
   build_and_upload_image:
+    needs: integration_test
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
@@ -15,10 +44,10 @@ jobs:
           docker build -t anr35/go-rest-api -f Dockerfile.dev .
       - name: docker login
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_ID }}
+          DOCKER_ID: ${{ secrets.DOCKER_ID }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER --password-stdin
+          echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_ID --password-stdin
       - name: push to docker hub
         run: |
           docker push anr35/go-rest-api
