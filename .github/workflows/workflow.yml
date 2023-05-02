@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "PER-2-workflow-test-2"
+env:
+  GITHUB_WORKSPACE: /home/runner/work/go-rest-api/go-rest-api
 jobs:
   integration_test:
     runs-on: ubuntu-latest
