@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-deployment
+  name: mongo-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: redis
+      component: mongo
   template:
     metadata:
       labels:
-        component: redis
+        component: mongo
     spec:
       containers:
-        - name: redis
-          image: redis:7.0.11-alpine3.17
+        - name: mongo
+          image: mongo:3.6
           ports:
-            - containerPort: 6379
+            - containerPort: 27017
           resources:
             requests:
               memory: 256Mi
@@ -24,4 +24,3 @@ spec:
             limits:
               memory: 512Mi
               cpu: "1"
-            
