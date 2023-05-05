@@ -18,6 +18,10 @@ spec:
         ports:
           - containerPort: 8000
         env:
+          - name: MONGODB_HOST
+            value: mongodb-cluster-ip-service
+          - name: MONGODB_PORT
+            value: '27017'
           - name: REDIS_HOST
             value: redis-cluster-ip-service
           - name: REDIS_PORT
