@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-cluster-ip-service
+  name: mongodb-cluster-ip-service
 spec:
   type: ClusterIP
   selector:
-    component: mongo
+    component: mongodb
   ports:
   - port: 27017
     targetPort: 27017
