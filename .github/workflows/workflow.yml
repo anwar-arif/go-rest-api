@@ -57,8 +57,8 @@ jobs:
         run: |
           docker-compose -f "docker-compose-dev.yml" down
 
-  build_and_upload_image:
-    if: ${{ (github.event.pull_request.merged == true) && ((github.ref == 'refs/heads/master') || (github.ref == 'refs/heads/develop')) }}
+  upload_image:
+    if: ${{ (github.event_name != 'push') && (github.ref == 'refs/heads/master') }}
     runs-on: ubuntu-latest
     needs:
       - unit_test
@@ -83,3 +83,30 @@ jobs:
         run: |
           docker push anr35/go-rest-api
 
+  deploy:
+    needs: upload_image
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+
+      - name: setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT_ID }}
+
+      - name: configure docker to use gcloud CLI as credential helper for authentication
+        run: |
+          gcloud --quiet auth configure-docker
+
+      - name: get GKE credentials
+        uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      - name: deploy to GKE cluster
+        run: |
+          kubectl apply -f k8s
