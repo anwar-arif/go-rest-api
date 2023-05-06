@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
+	"go-rest-api/config"
 	"go-rest-api/logger"
 	"log"
 	"time"
@@ -14,13 +15,13 @@ type Redis struct {
 	lgr        logger.StructLogger
 }
 
-func New(ctx context.Context, uri string, databaseId int, timeout time.Duration, lgr logger.StructLogger) (*Redis, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func New(ctx context.Context, cfgRedis *config.Redis, lgr logger.StructLogger) (*Redis, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), cfgRedis.DBTimeOut)
 	defer cancel()
 
 	connectionOption := &redis.Options{
-		Addr:     uri,
-		DB:       databaseId,
+		Addr:     cfgRedis.URL,
+		DB:       cfgRedis.DbID,
 		Password: "",
 	}
 
@@ -35,7 +36,7 @@ func New(ctx context.Context, uri string, databaseId int, timeout time.Duration,
 
 	rds := &Redis{
 		client,
-		databaseId,
+		cfgRedis.DbID,
 		lgr,
 	}
 

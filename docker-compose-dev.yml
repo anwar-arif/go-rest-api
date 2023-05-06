@@ -36,4 +36,4 @@ services:
       - ./dev.config.yml:/etc/go-rest-api/dev.config.yml
     ports:
       - "8000:8000"
-    command: 'serve-rest --config /etc/go-rest-api/dev.config.yml'
+    command: 'serve-rest --config /etc/go-rest-api/dev.config.yml --env=dev'

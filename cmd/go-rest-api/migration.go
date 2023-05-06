@@ -21,21 +21,21 @@ var migrationRoot = &cobra.Command{
 	Short: "Run database migrations",
 	Long:  `Migration is a tool to generate and modify database tables`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		cfgMongo := config.GetMongo(cfgPath)
+		cfgMongo := config.GetMongo(cfgPath, env, envPath)
 		cfgDBTable := config.GetTable(cfgPath)
-		cfgRedis := config.GetRedis(cfgPath)
+		cfgRedis := config.GetRedis(cfgPath, envPath)
 
 		ctx := context.Background()
 
 		lgr := logger.DefaultOutStructLogger
 
-		mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+		mgo, err := infraMongo.New(ctx, cfgMongo)
 		if err != nil {
 			return err
 		}
 		defer mgo.Close(ctx)
 
-		rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
+		rds, err := infraRedis.New(ctx, cfgRedis, lgr)
 		if err != nil {
 			return err
 		}

@@ -28,10 +28,23 @@ func TestSignatures(t *testing.T) {
 
 var (
 	cfgPath string
+	env     string
+	envPath string
 )
+
+func setEnvPath() {
+	if env == "dev" {
+		envPath = "../dev.env"
+	} else if env == "test" {
+		envPath = "../test.env"
+	} else {
+		envPath = ""
+	}
+}
 
 func init() {
 	flag.StringVar(&cfgPath, "config", "../test.config.yml", "config file path")
+	flag.StringVar(&env, "env", "../test.env", "environment type: dev, test")
 }
 
 func getAddressFromHostAndPort(host string, port int) string {
@@ -46,6 +59,7 @@ func getAddressFromHostAndPort(host string, port int) string {
 }
 
 var _ = BeforeSuite(func() {
+	setEnvPath()
 	By("going for api, db, kv initialization")
 	// get configuration
 	cfgApp := config.GetApp(cfgPath)
@@ -53,8 +67,10 @@ var _ = BeforeSuite(func() {
 	// Initialize api client with timeout
 	apiClient := &http.Client{Timeout: time.Minute * 2}
 
-	cfgMongo := config.GetMongo(cfgPath)
-	cfgRedis := config.GetRedis(cfgPath)
+	By(fmt.Sprintf("envPath %v", envPath))
+
+	cfgMongo := config.GetMongo(cfgPath, env, envPath)
+	cfgRedis := config.GetRedis(cfgPath, envPath)
 
 	lgr := logger.DefaultOutStructLogger
 
@@ -62,11 +78,11 @@ var _ = BeforeSuite(func() {
 
 	// Initialize mongoDB
 	By(fmt.Sprintf("mongo config: %v", cfgMongo))
-	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+	mgo, err := infraMongo.New(ctx, cfgMongo)
 	Expect(err).NotTo(HaveOccurred())
 
 	// initialize redis
-	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
+	rds, err := infraRedis.New(ctx, cfgRedis, lgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	// initialize db

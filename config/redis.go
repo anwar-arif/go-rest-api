@@ -8,31 +8,47 @@ import (
 )
 
 type Redis struct {
-	URL       string        `json:"url"`
-	DbID      int           `json:"db_id"`
-	DBTimeOut time.Duration `json:"db_timeout"`
+	Host      string        `yaml:"host"`
+	Port      string        `yaml:"port"`
+	URL       string        `yaml:"url"`
+	DbID      int           `yaml:"db_id"`
+	DBTimeOut time.Duration `yaml:"db_timeout"`
+}
+
+func (r *Redis) url() string {
+	return r.Host + ":" + r.Port
 }
 
 var redisConfig *Redis
 var redisOnce sync.Once
 
-func loadRedis(fileName string) error {
+func loadRedis(fileName, envFilePath string) error {
 	readConfig(fileName)
 	viper.AutomaticEnv()
 
+	redisHostEnv := viper.GetString("redis.env.host")
+	redisPortEnv := viper.GetString("redis.env.port")
+	dbId := viper.GetInt("redis.db_id")
+	dbTimeOut := viper.GetDuration("redis.time_out") * time.Second
+
+	readConfig(envFilePath)
+	viper.AutomaticEnv()
+
 	redisConfig = &Redis{
-		URL:       viper.GetString("redis.url"),
-		DbID:      viper.GetInt("redis.db_id"),
-		DBTimeOut: viper.GetDuration("redis.time_out") * time.Second,
+		Host:      viper.GetString(redisHostEnv),
+		Port:      viper.GetString(redisPortEnv),
+		DbID:      dbId,
+		DBTimeOut: dbTimeOut,
 	}
+	redisConfig.URL = redisConfig.url()
 
 	log.Println("redis config ", redisConfig)
 	return nil
 }
 
-func GetRedis(fileName string) *Redis {
+func GetRedis(fileName, envFilePath string) *Redis {
 	redisOnce.Do(func() {
-		loadRedis(fileName)
+		loadRedis(fileName, envFilePath)
 	})
 
 	return redisConfig

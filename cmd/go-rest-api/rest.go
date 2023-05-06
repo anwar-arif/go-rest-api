@@ -29,28 +29,40 @@ var srvCmd = &cobra.Command{
 	RunE:  serve,
 }
 
+func setEnvPath() {
+	if env == DevEnv {
+		envPath = "dev.env"
+	} else if env == TestEnv {
+		envPath = "test.env"
+	} else {
+		envPath = ""
+	}
+}
+
 func init() {
 	srvCmd.PersistentFlags().StringVarP(&cfgPath, "config", "c", "", "config file path")
+	srvCmd.PersistentFlags().StringVarP(&env, "env", "e", "", "environment type: dev, prod")
 }
 
 func serve(cmd *cobra.Command, args []string) error {
+	setEnvPath()
 	cfgApp := config.GetApp(cfgPath)
-	cfgMongo := config.GetMongo(cfgPath)
+	cfgMongo := config.GetMongo(cfgPath, env, envPath)
 	cfgSentry := config.GetSentry(cfgPath)
 	cfgDBTable := config.GetTable(cfgPath)
-	cfgRedis := config.GetRedis(cfgPath)
+	cfgRedis := config.GetRedis(cfgPath, envPath)
 
 	ctx := context.Background()
 
 	lgr := logger.DefaultOutStructLogger
 
-	mgo, err := infraMongo.New(ctx, cfgMongo.URL, cfgMongo.DBName, cfgMongo.DBTimeOut)
+	mgo, err := infraMongo.New(ctx, cfgMongo)
 	if err != nil {
 		return err
 	}
 	defer mgo.Close(ctx)
 
-	rds, err := infraRedis.New(ctx, cfgRedis.URL, cfgRedis.DbID, cfgRedis.DBTimeOut, lgr)
+	rds, err := infraRedis.New(ctx, cfgRedis, lgr)
 	if err != nil {
 		return err
 	}

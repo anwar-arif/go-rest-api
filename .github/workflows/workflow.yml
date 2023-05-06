@@ -51,7 +51,7 @@ jobs:
       - name: run tests
         run: |
           cd e2e_test
-          go test --config=../test.config.yml -ginkgo.v
+          go test --config=../test.config.yml -ginkgo.v --env=test
 
       - name: stop containers
         run: |

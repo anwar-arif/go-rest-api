@@ -3,9 +3,7 @@ package mongo
 import (
 	"context"
 	"encoding/json"
-	"log"
-	"time"
-
+	"go-rest-api/config"
 	"go-rest-api/infra"
 	"go-rest-api/logger"
 	"go-rest-api/utils"
@@ -13,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 )
 
 // Mongo holds necessery fields and
@@ -25,25 +24,29 @@ type Mongo struct {
 }
 
 // New returns a new instance of mongodb using session s
-func New(ctx context.Context, uri, name string, timeout time.Duration, opts ...Option) (*Mongo, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func New(ctx context.Context, cfgMongo *config.Mongo, opts ...Option) (*Mongo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), cfgMongo.DBTimeOut)
 	defer cancel()
 
 	minPoolSize := uint64(10)
 	maxPoolSize := uint64(100)
 	connectionOption := &options.ClientOptions{
-		SocketTimeout:          &timeout,
-		ConnectTimeout:         &timeout,
+		SocketTimeout:          &cfgMongo.DBTimeOut,
+		ConnectTimeout:         &cfgMongo.DBTimeOut,
 		MaxPoolSize:            &maxPoolSize,
 		MinPoolSize:            &minPoolSize,
-		ServerSelectionTimeout: &timeout,
+		ServerSelectionTimeout: &cfgMongo.DBTimeOut,
 		RetryWrites:            utils.TrueP(),
 		ReadPreference:         readpref.Secondary(),
+		Auth: &options.Credential{
+			Username: cfgMongo.UserName,
+			Password: cfgMongo.Password,
+		},
 		//ReplicaSet:             nil,
 		//Direct:                 nil,
 	}
 	log.Println("hitting mongo connect...")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri), connectionOption)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfgMongo.URL), connectionOption)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +59,8 @@ func New(ctx context.Context, uri, name string, timeout time.Duration, opts ...O
 
 	db := &Mongo{
 		Client:   client,
-		database: client.Database(name),
-		name:     name,
+		database: client.Database(cfgMongo.DBName),
+		name:     cfgMongo.DBName,
 	}
 	for _, opt := range opts {
 		opt.apply(db)

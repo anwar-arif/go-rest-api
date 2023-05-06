@@ -7,6 +7,13 @@ import (
 )
 
 var cfgPath string
+var env string
+var envPath string
+
+const (
+	DevEnv  = "dev"
+	TestEnv = "test"
+)
 
 // rootCmd is the root of all sub commands in the binary
 // it doesn't have a Run method as it executes other sub commands
