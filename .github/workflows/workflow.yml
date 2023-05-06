@@ -58,7 +58,7 @@ jobs:
           docker-compose -f "docker-compose-dev.yml" down
 
   upload_image:
-    if: ${{ (github.event_name != 'push') && (github.ref == 'refs/heads/master') }}
+    if: ${{ (github.event_name == 'push') && (github.ref == 'refs/heads/master') }}
     runs-on: ubuntu-latest
     needs:
       - unit_test
