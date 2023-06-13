@@ -11,27 +11,34 @@ $ make build
 
 ### Run application binary (run server)
 ```bash
-$ go-rest-api serve-rest
+$ go-rest-api serve-rest -c local.config.yml --env=local
 or
 $ make run
 ```
-
-## Run on Container
-```bash
-$ docker-compose up --build
-or
-$ make serve
-```
-
-## Testing
 ### unit test
 ```bash
 $ go test $(go list ./... | grep -v go-rest-api/e2e_test) -v
 ```
 ### end to end test
+- run test server
 ```bash
-$ cd e2e_test
-$ go test --config=../test.config.yml -ginkgo.v
+$ ./build.sh && go-rest-api serve-rest --config test.config.yml --env=test
+or 
+$ make test-server
+```
+- in seperate terminal window run the test suites
+```bash
+$ go test ./e2e_test --config=../test.config.yml -ginkgo.v --env=test
+or 
+$ make run-tests 
+```
+
+
+## Run on Container
+```bash
+$ docker-compose -f docker-compose-dev.yml up --build
+or
+$ make serve-container
 ```
 
 ## Folder structure

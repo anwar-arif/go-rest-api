@@ -20,7 +20,7 @@ type Mongo struct {
 }
 
 func (m *Mongo) url(env string) string {
-	if env == "dev" || env == "test" {
+	if m.UserName != "" && m.Password != "" {
 		return "mongodb://" + m.UserName + ":" + m.Password + "@" + m.Host + ":" + m.Port
 	}
 	return "mongodb://" + m.Host + ":" + m.Port

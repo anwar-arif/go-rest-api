@@ -12,7 +12,7 @@ app:
   access_token_expires_in:
     300
 mongo:
-  db_name: boilerplate_test
+  db_name: boilerplate_local
   time_out: 30
   env:
     host: MONGODB_HOST

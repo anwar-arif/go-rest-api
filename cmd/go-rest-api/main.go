@@ -11,8 +11,10 @@ var env string
 var envPath string
 
 const (
-	DevEnv  = "dev"
-	TestEnv = "test"
+	ProdEnv  = "prod"
+	DevEnv   = "dev"
+	TestEnv  = "test"
+	LocalEnv = "local"
 )
 
 // rootCmd is the root of all sub commands in the binary
