@@ -41,6 +41,9 @@ or
 $ make serve-container
 ```
 
+## Run on local kubernetes cluster
+Steps are described in `README.md` file in `k8s` folder
+
 ## Folder structure
 
 * api folder contains rest controllers, middlewares
