@@ -21,9 +21,9 @@ spec:
           image: mongo:3.6
           ports:
             - containerPort: 27017
-          volumeMounts:
-            - mountPath: /data/db
-              name: mongodb-storage
+#          volumeMounts:
+#            - mountPath: /data/db
+#              name: mongodb-storage
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
