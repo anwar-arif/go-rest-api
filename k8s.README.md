@@ -53,3 +53,4 @@ helm install \
   --create-namespace \
   --version v1.12.0 
 ```
+- now you should be able to see the working server
