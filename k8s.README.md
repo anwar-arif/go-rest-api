@@ -44,3 +44,12 @@ kubectl create secret generic mongodb-user-pass \
 - also add `cluster name`, `project id` `compute zone` in github secrets
 - names of these secrets must match the secret names in github workflows.yml file
 - commit any changes and result should trigger the deployment job
+- install certificate manager using helm in your cluster
+```bash
+helm repo add jetstack https://charts.jetstack.io
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.12.0 
+```
