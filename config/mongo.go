@@ -31,6 +31,7 @@ var mongoConfig *Mongo
 
 // loadMongo loads config from path
 func loadMongo(fileName, env, envFilePath string) error {
+	// read config file
 	readConfig(fileName)
 	viper.AutomaticEnv()
 
@@ -41,6 +42,7 @@ func loadMongo(fileName, env, envFilePath string) error {
 	dbName := viper.GetString("mongo.db_name")
 	dbTimeOut := viper.GetDuration("mongo.time_out") * time.Second
 
+	// read env file
 	readConfig(envFilePath)
 	viper.AutomaticEnv()
 

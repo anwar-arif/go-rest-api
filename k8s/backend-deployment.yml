@@ -22,13 +22,13 @@ spec:
             value: mongodb-cluster-ip-service
           - name: MONGODB_PORT
             value: '27017'
-          - name: MONGO_USERNAME
+          - name: MONGODB_USERNAME
             valueFrom:
               secretKeyRef:
                 name: mongodb-user-pass
                 key: MONGO_INITDB_ROOT_USERNAME
                 
-          - name: MONGO_PASSWORD
+          - name: MONGODB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mongodb-user-pass

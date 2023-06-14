@@ -17,8 +17,8 @@ mongo:
   env:
     host: MONGODB_HOST
     port: MONGODB_PORT
-    user_name: MONGO_USERNAME
-    password: MONGO_PASSWORD
+    user_name: MONGODB_USERNAME
+    password: MONGODB_PASSWORD
 redis:
   db_id: 0
   time_out: 30

@@ -14,3 +14,19 @@ You might see `503 Service Temporarily Unavailable` error in namespaces other th
 In this case, you have to run in `default` namespace  \
 or move ingress controller secret to your preferred namespace 
 
+# Deploy on GKE
+- create a cluster in [GKE](https://console.cloud.google.com/)
+- create service account for github deployer
+- install [helm](https://helm.sh/docs/intro/install/#from-script) in k8s cluster
+- create secret for `mongodb-user-pass`
+```bash
+kubectl create secret generic mongodb-user-pass \
+--from-literal=MONGO_INITDB_ROOT_USERNAME=root \
+--from-literal=MONGO_INITDB_ROOT_PASSWORD='secret' 
+```
+- install `ingress-nginx` using [helm](https://kubernetes.github.io/ingress-nginx/deploy/#using-helm)
+```bash
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace
+```

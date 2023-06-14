@@ -42,7 +42,7 @@ $ make serve-container
 ```
 
 ## Run on local kubernetes cluster
-Steps are described in `README.md` file in `k8s` folder
+Steps are described in `k8s.README.md` file
 
 ## Folder structure
 
