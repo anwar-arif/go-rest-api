@@ -16,21 +16,10 @@ or move ingress controller secret to your preferred namespace
 
 # Deploy on GKE
 - create a cluster in [GKE](https://console.cloud.google.com/)
+- set region `gcloud config set compute/region your_compute_region`
 - set compute zone `gcloud config set compute/zone your_compute_zone`
 - set cluster `gcloud config set container/cluster your_cluster_name`
 - get credentials `gcloud container clusters get-credentials your_cluster_name`
-- install [helm](https://helm.sh/docs/intro/install/#from-script) in k8s cluster
-```bash
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh 
-```
-- install `ingress-nginx` using [helm](https://kubernetes.github.io/ingress-nginx/deploy/#using-helm)
-```bash
-helm upgrade --install ingress-nginx ingress-nginx \
-  --repo https://kubernetes.github.io/ingress-nginx \
-  --namespace ingress-nginx --create-namespace
-```
 - create secret for `mongodb-user-pass`
 ```bash
 kubectl create secret generic mongodb-user-pass \
@@ -43,6 +32,18 @@ kubectl create secret generic mongodb-user-pass \
 - add these secrets in `github action secrets` section
 - also add `cluster name`, `project id` `compute zone` in github secrets
 - names of these secrets must match the secret names in github workflows.yml file
+- install [helm](https://helm.sh/docs/intro/install/#from-script) in k8s cluster
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh 
+```
+- install `ingress-nginx` using [helm](https://kubernetes.github.io/ingress-nginx/deploy/#using-helm)
+```bash
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace
+```
 - commit any changes and result should trigger the deployment job
 - install certificate manager using helm in your cluster
 ```bash
