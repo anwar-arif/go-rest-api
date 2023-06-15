@@ -39,7 +39,7 @@ kubectl create secret generic mongodb-user-pass \
 ```
 - create service account in `IAM` section with role `Kubernetes Engine Admin` to deploy from github action 
 - create a key for the service account and download the key
-- encode the key with `base64` and add the encoded key in github keys for corresponding project
+- encode the key with `base64` and add the encoded key in GitHub keys for corresponding project
 - add these secrets in `github action secrets` section
 - also add `cluster name`, `project id` `compute zone` in github secrets
 - names of these secrets must match the secret names in github workflows.yml file
