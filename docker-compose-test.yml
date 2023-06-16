@@ -1,0 +1,39 @@
+version: '3.3'
+
+services:
+  mongo:
+    image: mongo:3.6
+    restart: always
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - ./storage/mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+
+  redis:
+    image: redis:7.0.11
+    restart: always
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  backend:
+    build:
+      dockerfile: Dockerfile.test
+      context: .
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./test.config.yml:/etc/go-rest-api/test.config.yml
+    ports:
+      - "8000:8000"
+    command: 'serve-rest --config /etc/go-rest-api/test.config.yml --env=dev'

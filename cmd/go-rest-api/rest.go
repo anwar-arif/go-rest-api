@@ -34,6 +34,10 @@ func setEnvPath() {
 		envPath = "dev.env"
 	} else if env == TestEnv {
 		envPath = "test.env"
+	} else if env == LocalEnv {
+		envPath = "local.env"
+	} else if env == ProdEnv {
+		envPath = "prod.env"
 	} else {
 		envPath = ""
 	}
