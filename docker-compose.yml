@@ -22,7 +22,6 @@ services:
       - REDIS_PORT=$REDIS_PORT
 
   backend:
-    build: .
     image: anr35/go-rest-api:latest
     depends_on:
       - mongo
@@ -31,4 +30,4 @@ services:
        - ./config.yml:/etc/go-rest-api/config.yml
     ports:
        - "8000:8000"
-    command: 'serve-rest --config /etc/go-rest-api/config.yml'
+    command: 'serve-rest --config /etc/go-rest-api/config.yml --env=prod'

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: backend-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       component: backend
@@ -22,13 +22,13 @@ spec:
             value: mongodb-cluster-ip-service
           - name: MONGODB_PORT
             value: '27017'
-          - name: MONGO_USERNAME
+          - name: MONGODB_USERNAME
             valueFrom:
               secretKeyRef:
                 name: mongodb-user-pass
                 key: MONGO_INITDB_ROOT_USERNAME
                 
-          - name: MONGO_PASSWORD
+          - name: MONGODB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mongodb-user-pass
@@ -37,10 +37,10 @@ spec:
             value: redis-cluster-ip-service
           - name: REDIS_PORT
             value: '6379'
-        resources:
-          requests:
-            memory: 256Mi
-            cpu: "1"
-          limits:
-            memory: 512Mi
-            cpu: "2"
+#        resources:
+#          requests:
+#            memory: 256Mi
+#            cpu: "1"
+#          limits:
+#            memory: 512Mi
+#            cpu: "2"
