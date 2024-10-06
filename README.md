@@ -1,6 +1,9 @@
 # Go rest api
 
 ## Run on local
+#### Pre-requisites
+- redis server running at port 6379
+- mongodb server running at port 27017
 ### Build application binary
 ```bash
 $ ./build.sh
