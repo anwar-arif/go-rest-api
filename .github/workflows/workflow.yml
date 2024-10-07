@@ -55,7 +55,7 @@ jobs:
 
       - name: stop containers
         run: |
-          docker-compose -f "docker-compose-dev.yml" down
+          docker compose -f "docker-compose-dev.yml" down
 
   upload_image:
 #    if: ${{ (github.event_name == 'push') && (github.ref == 'refs/heads/master') }}
