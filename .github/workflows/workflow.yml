@@ -37,7 +37,7 @@ jobs:
 
       - name: run containers
         run: |
-          docker-compose -f "docker-compose-dev.yml" up -d --build
+          docker compose -f "docker-compose-dev.yml" up -d --build
 
       - name: setup golang
         uses: actions/setup-go@v4
